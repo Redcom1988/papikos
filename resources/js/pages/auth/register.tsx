@@ -14,6 +14,8 @@ type RegisterForm = {
     email: string;
     password: string;
     password_confirmation: string;
+    phone: string;
+    is_owner: boolean;
 };
 
 export default function Register() {
@@ -22,6 +24,8 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
+        phone: '',
+        is_owner: false,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -100,6 +104,39 @@ export default function Register() {
                         />
                         <InputError message={errors.password_confirmation} />
                     </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input
+                            id="phone"
+                            type="tel"
+                            required
+                            autoFocus
+                            tabIndex={5}
+                            autoComplete="phone"
+                            value={data.phone}
+                            onChange={(e) => setData('phone', e.target.value)}
+                            disabled={processing}
+                            placeholder="Phone Number"
+                        />
+                        <InputError message={errors.phone} className="mt-2" />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <input
+                            id="is_owner"
+                            name="is_owner"
+                            type="checkbox"
+                            checked={data.is_owner}
+                            onChange={(e) => setData('is_owner', e.target.checked)}
+                            disabled={processing}
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        />
+                        <Label htmlFor="is_owner" className="text-sm text-gray-900">
+                            I want to list rooms (become an owner)
+                        </Label>
+                    </div>
+                    <InputError message={errors.is_owner} />
 
                     <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
