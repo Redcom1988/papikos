@@ -2,22 +2,77 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            UserSeeder::class,
+            RoomSeeder::class,
+            BookmarkSeeder::class,
+            AppointmentSeeder::class,
+            PaymentSeeder::class,
+            ReviewSeeder::class,
         ]);
+    }
+}
+
+// File: database/seeders/UserSeeder.php
+namespace Database\Seeders;
+
+use App\Models\User;
+use App\Models\PayoutMethod;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
+class UserSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Create admin user
+        $admin = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
+            'phone' => '081234567890',
+            'is_owner' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        // Create test owner
+        $owner = User::create([
+            'name' => 'Room Owner',
+            'email' => 'owner@example.com',
+            'password' => Hash::make('password'),
+            'phone' => '081234567891',
+            'is_owner' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        // Create payout method for owner
+        PayoutMethod::create([
+            'owner_id' => $owner->id,
+            'type' => 'ovo',
+            'account_identifier' => '081234567891',
+            'account_name' => 'Room Owner',
+            'is_primary' => true,
+            'is_active' => true,
+        ]);
+
+        // Create test renter
+        User::create([
+            'name' => 'John Renter',
+            'email' => 'renter@example.com',
+            'password' => Hash::make('password'),
+            'phone' => '081234567892',
+            'is_owner' => false,
+            'email_verified_at' => now(),
+        ]);
+
+        // Create more random users
+        User::factory(10)->create();
+        User::factory(5)->create(['is_owner' => true]);
     }
 }
