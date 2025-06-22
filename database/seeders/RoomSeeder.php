@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Room;
-use App\Models\RoomFacility;
+use App\Models\Facility;
 use App\Models\RoomImage;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -13,6 +13,17 @@ class RoomSeeder extends Seeder
     public function run(): void
     {
         $owners = User::where('is_owner', true)->get();
+
+        // If no owners exist, create a sample owner
+        if ($owners->isEmpty()) {
+            $owner = User::create([
+                'name' => 'Sample Owner',
+                'email' => 'owner@example.com',
+                'password' => bcrypt('password'),
+                'is_owner' => true,
+            ]);
+            $owners = collect([$owner]);
+        }
 
         // Sample Google Maps embed links for different areas
         $sampleMapLinks = [
@@ -40,17 +51,15 @@ class RoomSeeder extends Seeder
                     'is_available' => rand(0, 10) > 1, // 90% available
                 ]);
 
-                // Add facilities
-                $facilities = ['WiFi', 'AC', 'Private Bathroom', 'Wardrobe', 'Desk', 'Chair', 'Bed', 'Parking', 'Security', 'Laundry'];
-                $selectedFacilities = fake()->randomElements($facilities, rand(4, 8));
+                // Add facilities using the new many-to-many relationship
+                $facilityNames = ['WiFi', 'AC', 'Private Bathroom', 'Wardrobe', 'Desk', 'Chair', 'Bed', 'Parking', 'Security', 'Laundry'];
+                $selectedFacilityNames = fake()->randomElements($facilityNames, rand(4, 8));
                 
-                foreach ($selectedFacilities as $facility) {
-                    RoomFacility::create([
-                        'room_id' => $room->id,
-                        'name' => $facility,
-                        'description' => "High quality $facility available",
-                    ]);
-                }
+                // Get the actual facility models
+                $facilities = Facility::whereIn('name', $selectedFacilityNames)->get();
+                
+                // Attach facilities to the room using the many-to-many relationship
+                $room->facilities()->attach($facilities);
 
                 // Add images
                 RoomImage::create([

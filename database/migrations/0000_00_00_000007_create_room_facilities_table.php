@@ -12,16 +12,18 @@ return new class extends Migration
         Schema::create('room_facilities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('room_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->text('description')->nullable();
+            $table->foreignId('facility_id')->constrained()->onDelete('cascade');
             $table->timestamps();
             
-            $table->index(['room_id', 'type']);
+            // Ensure unique combinations
+            $table->unique(['room_id', 'facility_id']);
+            $table->index(['room_id']);
+            $table->index(['facility_id']);
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('room_features');
+        Schema::dropIfExists('room_facilities');
     }
 };
