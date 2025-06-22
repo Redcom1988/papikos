@@ -61,14 +61,19 @@ class RoomSeeder extends Seeder
         $usedNames = [];
 
         foreach ($owners as $owner) {
-            // Create 1-3 rooms per owner
-            $roomCount = rand(1, 3);
+            $roomCount = rand(3, 6);
             
             for ($i = 0; $i < $roomCount; $i++) {
-                // Get a unique room name
-                do {
-                    $roomName = fake()->randomElement($roomNames);
-                } while (in_array($roomName, $usedNames));
+                // Use base name + number if needed for uniqueness
+                $baseName = fake()->randomElement($roomNames);
+                $roomName = $baseName;
+                $counter = 1;
+                
+                // Add number suffix if name is already used
+                while (in_array($roomName, $usedNames)) {
+                    $roomName = $baseName . ' ' . $counter;
+                    $counter++;
+                }
                 
                 $usedNames[] = $roomName;
 
