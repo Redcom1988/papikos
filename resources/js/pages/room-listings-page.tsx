@@ -1,10 +1,16 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Star, Filter, Search, SlidersHorizontal } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, Filter, Search, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { useBookmarks } from '@/hooks/use-bookmarks';
 import BookmarkButton from '@/components/ui/bookmark-button';
 import RoomImage from '@/components/ui/room-image';
+import { 
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface Room {
     id: number;
@@ -133,22 +139,10 @@ export default function RoomListings() {
     useEffect(() => {
         const timer = setTimeout(() => {
             applyFilters();
-        }, 500);
+        }, 500); // Use consistent debounce for all changes
+        
         return () => clearTimeout(timer);
-    }, [filters.search]);
-
-    // Immediate filter application
-    useEffect(() => {
-        applyFilters();
-    }, [filters.facilities, filters.rating, filters.sortBy]);
-
-    // Price filter with debounce
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            applyFilters();
-        }, 800);
-        return () => clearTimeout(timer);
-    }, [filters.minPrice, filters.maxPrice]);
+    }, [filters]); // Watch the entire filters object
 
     const priceRanges = [
         { label: 'Below 500k', min: 0, max: 500000 },
@@ -274,28 +268,50 @@ export default function RoomListings() {
                                 placeholder="Search rooms, locations..."
                                 value={filters.search}
                                 onChange={(e) => handleSearchChange(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                                className="w-full h-10 pl-10 pr-4 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
                             />
                         </div>
 
-                        {/* Sort */}
+                        {/* Sort By and Mobile Filter */}
                         <div className="flex items-center space-x-4">
-                            <select
-                                value={filters.sortBy}
-                                onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value }))}
-                                className="px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                            >
-                                {sortOptions.map(option => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
+                            {/* Sort By Label and Dropdown */}
+                            <div className="flex items-center space-x-2">
+                                <label className="text-sm font-medium text-foreground whitespace-nowrap">
+                                    Sort by:
+                                </label>
+                                
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button className="h-10 px-3 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-primary focus:border-primary flex items-center gap-2 hover:bg-muted transition-colors">
+                                            <span className="text-sm">
+                                                {sortOptions.find(option => option.value === filters.sortBy)?.label || 'Select...'}
+                                            </span>
+                                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    
+                                    <DropdownMenuContent align="end">
+                                        {sortOptions.map(option => (
+                                            <DropdownMenuItem
+                                                key={option.value}
+                                                onClick={() => setFilters(prev => ({ ...prev, sortBy: option.value }))}
+                                                className={`cursor-pointer ${
+                                                    filters.sortBy === option.value 
+                                                        ? 'bg-primary/10 text-primary font-medium' 
+                                                        : ''
+                                                }`}
+                                            >
+                                                {option.label}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
 
                             {/* Mobile Filter Toggle */}
                             <button
                                 onClick={() => setShowMobileFilters(!showMobileFilters)}
-                                className="lg:hidden flex items-center space-x-2 px-4 py-2 border border-border bg-background text-foreground rounded-lg hover:bg-muted transition-colors"
+                                className="lg:hidden flex items-center space-x-2 h-10 px-4 border border-border bg-background text-foreground rounded-lg hover:bg-muted transition-colors"
                             >
                                 <SlidersHorizontal className="w-4 h-4" />
                                 <span>Filters</span>
