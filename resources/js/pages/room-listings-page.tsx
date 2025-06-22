@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Star, Filter, Search, SlidersHorizontal } from 'lucide-react';
 import { useBookmarks } from '@/hooks/use-bookmarks';
 import BookmarkButton from '@/components/ui/bookmark-button';
+import RoomImage from '@/components/ui/room-image';
 
 interface Room {
     id: number;
@@ -46,7 +47,7 @@ interface Facility {
 
 interface PageProps extends SharedData {
     rooms: PaginatedRooms;
-    facilities: Facility[]; // Changed from string[] to Facility[]
+    facilities: Facility[];
     filters: {
         search: string;
         min_price: number;
@@ -388,18 +389,15 @@ export default function RoomListings() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
                                         {rooms.data.map(room => (
                                             <div key={room.id} className="bg-card border border-border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                                                {/* Room Image */}
+                                                {/* Room Image - Updated with RoomImage component */}
                                                 <div className="h-48 bg-muted relative group">
                                                     <Link href={`/rooms/${room.id}`} className="absolute inset-0 z-0">
-                                                        {room.primary_image ? (
-                                                            <img 
-                                                                src={room.primary_image} 
-                                                                alt={room.title}
-                                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                                            />
-                                                        ) : (
-                                                            <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-20"></div>
-                                                        )}
+                                                        <RoomImage
+                                                            src={room.primary_image}
+                                                            alt={room.title}
+                                                            className="h-full transition-transform duration-300 group-hover:scale-105"
+                                                            objectFit="cover"
+                                                        />
                                                     </Link>
                                                     
                                                     {/* Bookmark Button */}

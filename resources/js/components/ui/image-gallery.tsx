@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import RoomImage from './room-image';
 
 interface ImageGalleryImage {
     id: number;
@@ -25,38 +26,41 @@ export default function ImageGallery({ images, className = "" }: ImageGalleryPro
 
     return (
         <div className={`flex gap-2 h-full ${className}`}>
-            {/* Main Large Image - Takes most of the space */}
+            {/* Main Large Image */}
             <div className="flex-1 overflow-hidden rounded-lg">
-                <img 
-                    src={images[selectedImageIndex]?.url || images[0]?.url} 
+                <RoomImage 
+                    src={images[selectedImageIndex]?.url || images[0]?.url}
                     alt={images[selectedImageIndex]?.caption || 'Room image'}
-                    className="w-full h-full object-cover"
+                    className="h-full"
+                    objectFit="cover"
                 />
             </div>
             
-            {/* Scrollable Thumbnail Column - Fixed width */}
+            {/* Scrollable Thumbnail Column */}
             <div className="w-20 flex flex-col gap-1">
                 <div className="flex-1 overflow-y-auto min-h-0 space-y-1">
                     {images.map((image, index) => (
                         <div 
                             key={image.id} 
-                            className={`aspect-square cursor-pointer rounded-md overflow-hidden transition-all duration-200 ${
+                            className={`aspect-square rounded-md overflow-hidden transition-all duration-200 bg-muted ${
                                 selectedImageIndex === index 
                                     ? 'ring-2 ring-blue-500 opacity-100' 
                                     : 'opacity-70 hover:opacity-100'
                             }`}
-                            onClick={() => setSelectedImageIndex(index)}
                         >
-                            <img 
-                                src={image.url} 
+                            <RoomImage 
+                                src={image.url}
                                 alt={image.caption}
-                                className="w-full h-full object-cover"
+                                className="h-full"
+                                objectFit="contain"
+                                onClick={() => setSelectedImageIndex(index)}
+                                loadingSize="sm"
                             />
                         </div>
                     ))}
                 </div>
                 
-                {/* Show more indicator if there are many images */}
+                {/* Show more indicator */}
                 {images.length > 6 && (
                     <div className="text-xs text-gray-400 text-center py-1 bg-gray-50 rounded-md">
                         +{images.length - 6}
