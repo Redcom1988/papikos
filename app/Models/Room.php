@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Room extends Model
 {
@@ -31,49 +35,49 @@ class Room extends Model
         ];
     }
 
-    public function owner()
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
 
-    public function facilities()
+    public function facilities(): BelongsToMany
     {
-        return $this->hasMany(RoomFacility::class);
+        return $this->belongsToMany(Facility::class, 'room_facilities');
     }
 
-    public function images()
+    public function images(): HasMany
     {
         return $this->hasMany(RoomImage::class);
     }
 
-    public function primaryImage()
+    public function primaryImage(): HasOne
     {
         return $this->hasOne(RoomImage::class)->where('is_primary', true);
     }
 
-    public function bookmarks()
+    public function bookmarks(): HasMany
     {
         return $this->hasMany(Bookmark::class);
     }
 
-    public function appointments()
+    public function appointments(): HasMany
     {
         return $this->hasMany(Appointment::class);
     }
 
-    public function payments()
+    public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
 
-    public function reviews()
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
 
     public function averageRating()
     {
-        return $this->reviews()->avg('overall_rating');
+        return $this->reviews()->avg('overall_rating') ?? 0;
     }
 
     public function getFormattedPriceAttribute()
@@ -83,13 +87,8 @@ class Room extends Model
 
     public static function getAvailableRooms($filters = [])
     {
-        $query = self::with([
-            'facilities', 
-            'images', 
-            'primaryImage', 
-            'reviews'
-        ])
-        ->where('is_available', true);
+        $query = self::with(['facilities', 'images', 'primaryImage', 'reviews'])
+            ->where('is_available', true);
 
         // Apply price filters
         if (!empty($filters['min_price'])) {
@@ -104,16 +103,16 @@ class Room extends Model
         if (!empty($filters['facilities']) && is_array($filters['facilities'])) {
             $query->whereHas('facilities', function ($q) use ($filters) {
                 $q->whereIn('name', $filters['facilities']);
-            }, '=', count($filters['facilities']));
+            });
         }
 
-        return $query->latest()->get()->map(function ($room) {
+        return $query->latest()->take(6)->get()->map(function ($room) {
             return [
                 'id' => $room->id,
                 'title' => $room->name,
                 'price' => $room->price,
                 'location' => $room->address,
-                'rating' => round($room->averageRating() ?? 0, 1),
+                'rating' => round($room->averageRating(), 1),
                 'reviewCount' => $room->reviews->count(),
                 'images' => $room->images->pluck('url')->toArray(),
                 'facilities' => $room->facilities->pluck('name')->toArray(),
@@ -128,13 +127,8 @@ class Room extends Model
 
     public static function getRoomDetails($roomId)
     {
-        $room = self::with([
-            'facilities', 
-            'images', 
-            'reviews.user',
-            'reviews.images',
-            'owner'
-        ])->findOrFail($roomId);
+        $room = self::with(['facilities', 'images', 'reviews.user', 'reviews.images', 'owner'])
+            ->findOrFail($roomId);
 
         return [
             'id' => $room->id,
@@ -145,7 +139,7 @@ class Room extends Model
             'embedded_map_link' => $room->embedded_map_link,
             'size' => $room->size,
             'max_occupancy' => $room->max_occupancy,
-            'rating' => round($room->averageRating() ?? 0, 1),
+            'rating' => round($room->averageRating(), 1),
             'reviewCount' => $room->reviews->count(),
             'images' => $room->images->map(function ($image) {
                 return [
@@ -181,6 +175,6 @@ class Room extends Model
 
     public static function getAllFacilities()
     {
-        return RoomFacility::distinct('name')->pluck('name')->toArray();
+        return \App\Models\Facility::select('id', 'name')->get()->toArray();
     }
 }
