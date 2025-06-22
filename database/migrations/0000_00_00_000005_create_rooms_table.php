@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->text('address');
+            $table->text('embedded_map_link')->nullable(); // for embedding maps
             $table->integer('price'); // in cents
             $table->integer('size')->nullable(); // in sqm
             $table->integer('max_occupancy')->default(1);
