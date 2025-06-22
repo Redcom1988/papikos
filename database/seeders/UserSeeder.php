@@ -11,20 +11,10 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create admin user
-        $admin = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-            'phone' => '081234567890',
-            'is_owner' => true,
-            'email_verified_at' => now(),
-        ]);
-
         // Create test owner
         $owner = User::create([
-            'name' => 'Room Owner',
-            'email' => 'owner@example.com',
+            'name' => 'Admin Owner',
+            'email' => 'admin@example.com',
             'password' => Hash::make('password'),
             'phone' => '081234567891',
             'is_owner' => true,
@@ -52,7 +42,7 @@ class UserSeeder extends Seeder
         ]);
 
         // Create more random users
-        User::factory(10)->create();
+        User::factory(10)->create(['is_owner' => false]);
         User::factory(5)->create(['is_owner' => true]);
     }
 }
