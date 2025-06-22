@@ -65,12 +65,12 @@ class User extends Authenticatable
 
     public function payoutMethods()
     {
-        return $this->hasMany(PayoutMethod::class, 'owner_id');
+        return $this->hasMany(PayoutMethod::class);
     }
 
     public function reports()
     {
-        return $this->hasMany(Report::class, 'reporter_id');
+        return $this->hasMany(Report::class);
     }
 
     // Helper methods
@@ -79,8 +79,13 @@ class User extends Authenticatable
         return $this->is_owner;
     }
 
-    public function hasBookmarked(Room $room): bool
+    public function isRenter(): bool
     {
-        return $this->bookmarks()->where('room_id', $room->id)->exists();
+        return !$this->is_owner;
+    }
+
+    public function hasVerifiedEmail(): bool
+    {
+        return !is_null($this->email_verified_at);
     }
 }
