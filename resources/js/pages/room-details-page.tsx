@@ -1,7 +1,15 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import { useState } from 'react';
-import { Flag, ArrowRight, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { 
+    Flag, 
+    ArrowRight, 
+    ChevronRight, 
+    Star, 
+    BarChart3, 
+    Home, 
+    Globe 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ImageGallery from '@/components/ui/image-gallery';
 import Modal from '@/components/ui/modal';
@@ -10,6 +18,7 @@ import { useBookmarks } from '@/hooks/use-bookmarks';
 import BookmarkButton from '@/components/ui/bookmark-button';
 import IconButton from '@/components/ui/icon-button';
 
+// Update the RoomDetails interface
 interface RoomDetails {
     id: number;
     title: string;
@@ -27,7 +36,13 @@ interface RoomDetails {
         caption: string;
         is_primary: boolean;
     }>;
-    facilities: string[];
+    // Updated facilities to be objects instead of strings
+    facilities: Array<{
+        id: number;
+        name: string;
+        description?: string;
+        icon?: string;
+    }>;
     owner: {
         id: number;
         name: string;
@@ -130,6 +145,14 @@ export default function RoomDetailsPage() {
         alert(`Rent request for ${room.title} - Payment integration coming soon!`);
     };
 
+    const handleSurveySchedule = () => {
+        if (!auth.user) {
+            router.visit(route('login'));
+            return;
+        }
+        setShowScheduleModal(true);
+    }
+
     const handleRatingClick = (category: string, rating: number) => {
         setReviewRatings(prev => ({
             ...prev,
@@ -144,13 +167,31 @@ export default function RoomDetailsPage() {
         { label: 'Rab, Jul 5', time: '2:00 Wita - 4:00 Wita' },
     ];
 
+    // Ensure page can scroll
+    useEffect(() => {
+        // Force restore scroll on component mount
+        document.body.style.overflow = 'auto';
+        
+        // Cleanup on unmount
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, []);
+
+    // Also add scroll restoration when modals close
+    useEffect(() => {
+        if (!showScheduleModal && !showReportModal) {
+            document.body.style.overflow = 'auto';
+        }
+    }, [showScheduleModal, showReportModal]);
+
     return (
         <>
             <Head title={`${room.title} - Papikos`}>
                 <meta name="csrf-token" content={document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''} />
             </Head>
             
-            <div className="min-h-screen bg-background text-foreground">
+            <div className="min-h-screen bg-background text-foreground overflow-auto">
                 {/* Header */}
                 <header className="bg-background border-b border-border">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -180,7 +221,7 @@ export default function RoomDetailsPage() {
                                                 <span className="text-xs font-medium text-muted-foreground">{auth.user.name?.charAt(0)}</span>
                                             </div>
                                         </button>
-                                        {/* Dashboard Button */}
+                                        {/* Dashboard Button - Updated with BarChart3 icon */}
                                         <button
                                             onClick={() => router.visit(route('dashboard'))}
                                             className="flex items-center space-x-2 bg-background border border-border text-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-muted transition-colors"
@@ -188,7 +229,7 @@ export default function RoomDetailsPage() {
                                         >
                                             <span>Dashboard</span>
                                             <div className="w-5 h-5 bg-muted rounded-full flex items-center justify-center">
-                                                <span className="text-xs font-medium text-muted-foreground">📊</span>
+                                                <BarChart3 className="w-3 h-3 text-muted-foreground" />
                                             </div>
                                         </button>
                                     </div>
@@ -273,9 +314,9 @@ export default function RoomDetailsPage() {
                                             size="md"
                                         />
                                         
-                                        {/* Rating Display */}
+                                        {/* Rating Display - Updated with Star icon */}
                                         <div className="flex items-center space-x-1 bg-card border border-border rounded-full px-3 shadow-sm h-8 min-w-fit">
-                                            <span className="text-yellow-400 text-sm">★</span>
+                                            <Star className="w-3 h-3 text-yellow-400 fill-current" />
                                             <span className="font-medium text-sm text-card-foreground">{room.rating}</span>
                                             <span className="text-muted-foreground text-xs">({room.reviewCount})</span>
                                         </div>
@@ -294,7 +335,7 @@ export default function RoomDetailsPage() {
                                         </Button>
                                         <Button 
                                             variant="outline" 
-                                            onClick={() => setShowScheduleModal(true)}
+                                            onClick={handleSurveySchedule}
                                             size="lg"
                                             className="border-border text-foreground hover:bg-muted"
                                         >
@@ -305,64 +346,26 @@ export default function RoomDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Room Highlights */}
+                        {/* Room Highlights - Updated to handle facility objects */}
                         <div className="mb-8">
                             <h3 className="text-lg font-semibold text-foreground mb-4">Room Highlights</h3>
-                            <div className="grid grid-cols-3 gap-6">
-                                {/* Left Column */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-6 h-6 text-muted-foreground">🚗</div>
-                                        <div>
-                                            <div className="font-medium text-sm text-foreground">Parking</div>
-                                            <div className="text-xs text-muted-foreground">20+ Motor</div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-6 h-6 text-muted-foreground">🏠</div>
-                                        <div>
-                                            <div className="font-medium text-sm text-foreground">Outdoor</div>
-                                            <div className="text-xs text-muted-foreground">Gazebo</div>
-                                        </div>
-                                    </div>
+                            
+                            {room.facilities && room.facilities.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {room.facilities.map((facility) => (
+                                        <span 
+                                            key={facility.id}
+                                            className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
+                                        >
+                                            {facility.name}
+                                        </span>
+                                    ))}
                                 </div>
-
-                                {/* Middle Column */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-6 h-6 text-muted-foreground">❄️</div>
-                                        <div>
-                                            <div className="font-medium text-sm text-foreground">AC</div>
-                                            <div className="text-xs text-muted-foreground">Tersedia</div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-6 h-6 text-muted-foreground">🛏️</div>
-                                        <div>
-                                            <div className="font-medium text-sm text-foreground">Kamar Mandi Dalam</div>
-                                            <div className="text-xs text-muted-foreground">Tersedia</div>
-                                        </div>
-                                    </div>
+                            ) : (
+                                <div className="bg-muted/50 border border-border rounded-lg p-6 text-center">
+                                    <div className="text-muted-foreground">No facilities information available</div>
                                 </div>
-
-                                {/* Right Column */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-6 h-6 text-muted-foreground">📺</div>
-                                        <div>
-                                            <div className="font-medium text-sm text-foreground">Luas</div>
-                                            <div className="text-xs text-muted-foreground">6x6x4 Meter</div>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-6 h-6 text-muted-foreground">🔧</div>
-                                        <div>
-                                            <div className="font-medium text-sm text-foreground">Built in</div>
-                                            <div className="text-xs text-muted-foreground">2024</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            )}
                         </div>
 
                         {/* Listing Owner */}
@@ -380,7 +383,7 @@ export default function RoomDetailsPage() {
                         {room.embedded_map_link && (
                             <div className="mb-8">
                                 <h3 className="text-lg font-semibold text-foreground mb-4">Location on Maps</h3>
-                                <div className="relative h-64 rounded-lg overflow-hidden bg-muted">
+                                <div className="relative h-128 rounded-lg overflow-hidden bg-muted">
                                     <iframe
                                         src={room.embedded_map_link}
                                         width="100%"
@@ -390,16 +393,7 @@ export default function RoomDetailsPage() {
                                         loading="lazy"
                                         referrerPolicy="no-referrer-when-downgrade"
                                     ></iframe>
-                                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                                        <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                                            <span className="text-primary-foreground text-lg">📍</span>
-                                        </div>
-                                    </div>
                                 </div>
-                                <p className="text-sm text-primary mt-2 flex items-center">
-                                    <span className="text-muted-foreground mr-2">🚗</span>
-                                    ~mins to Commute Destination
-                                </p>
                             </div>
                         )}
 
@@ -420,13 +414,17 @@ export default function RoomDetailsPage() {
                                                 <button
                                                     key={star}
                                                     onClick={() => handleRatingClick(key, star)}
-                                                    className={`text-2xl transition-colors ${
+                                                    className={`transition-colors hover:scale-110 ${
                                                         star <= reviewRatings[key as keyof typeof reviewRatings]
                                                             ? 'text-yellow-400'
                                                             : 'text-muted-foreground/30'
                                                     }`}
                                                 >
-                                                    ★
+                                                    <Star className={`w-6 h-6 ${
+                                                        star <= reviewRatings[key as keyof typeof reviewRatings]
+                                                            ? 'fill-current'
+                                                            : ''
+                                                    }`} />
                                                 </button>
                                             ))}
                                         </div>
@@ -553,13 +551,13 @@ export default function RoomDetailsPage() {
                     </Button>
                 </Modal>
 
-                {/* Footer */}
+                {/* Footer - Updated with Lucide icons */}
                 <footer className="bg-background border-t border-border py-8">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center">
                                 <div className="w-8 h-8 bg-primary rounded mr-3 flex items-center justify-center">
-                                    <span className="text-primary-foreground text-xs">🏠</span>
+                                    <Home className="w-4 h-4 text-primary-foreground" />
                                 </div>
                                 <span className="font-medium text-foreground">Logo</span>
                             </div>
@@ -573,7 +571,7 @@ export default function RoomDetailsPage() {
                                     <option>English</option>
                                 </select>
                                 <span>© 2022 Brand, Inc. • Privacy • Terms • Sitemap</span>
-                                <span>🌐</span>
+                                <Globe className="w-4 h-4" />
                             </div>
                         </div>
                     </div>
