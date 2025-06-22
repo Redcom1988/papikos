@@ -130,9 +130,9 @@ export default function Register() {
                             checked={data.is_owner}
                             onChange={(e) => setData('is_owner', e.target.checked)}
                             disabled={processing}
-                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                            className="h-4 w-4 text-primary focus:ring-primary border-border rounded bg-background"
                         />
-                        <Label htmlFor="is_owner" className="text-sm text-gray-900">
+                        <Label htmlFor="is_owner" className="text-sm text-foreground">
                             I want to list rooms (become an owner)
                         </Label>
                     </div>
