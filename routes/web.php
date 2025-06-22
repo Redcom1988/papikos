@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\RoomListingsController; // Add this
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -11,14 +13,16 @@ use Inertia\Inertia;
 // Home/Landing page
 Route::get('/', [HomeController::class, 'index'])->name('landing.page');
 
-// Room routes
-Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('room.show');
-Route::get('/api/rooms/{room}', [RoomController::class, 'getRoomDetails'])->name('room.details');
-Route::post('/api/tours/book', [RoomController::class, 'bookTour'])->name('tour.book')->middleware('auth');
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+// Room listings page
+Route::get('/rooms', [RoomListingsController::class, 'index'])->name('rooms.index');
 
 Route::middleware('auth')->group(function () {
+    // Bookmarks routes
+    Route::middleware(['auth'])->group(function () {
+        Route::post('/bookmarks/toggle', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle');
+        Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+    });
+
     // Settings routes
     Route::prefix('settings')->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -34,5 +38,11 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-require __DIR__.'/settings.php';
+// Individual room routes - kept in RoomController for room-specific operations
+Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('room.show');
+Route::get('/api/rooms/{room}', [RoomController::class, 'getRoomDetails'])->name('room.details');
+Route::post('/api/tours/book', [RoomController::class, 'bookTour'])->name('tour.book')->middleware('auth');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+
 require __DIR__.'/auth.php';

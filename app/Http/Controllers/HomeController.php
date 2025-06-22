@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Room;
+use App\Models\Bookmark;
+use App\Models\Facility;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,13 +24,22 @@ class HomeController extends Controller
         // Get available rooms with filters
         $rooms = Room::getAvailableRooms($filters);
         
-        // Get all available facilities for the filter dropdown
-        $availableFacilities = Room::getAllFacilities();
+        // Get all available facilities with IDs for the filter dropdown
+        $availableFacilities = Facility::select('id', 'name')->get()->toArray();
+
+        // Get user's bookmarks if authenticated
+        $userBookmarks = [];
+        if (Auth::check()) {
+            $userBookmarks = Bookmark::where('user_id', Auth::id())
+                ->pluck('room_id')
+                ->toArray();
+        }
 
         return Inertia::render('landing-page', [
             'rooms' => $rooms,
             'facilities' => $availableFacilities,
             'filters' => $filters,
+            'userBookmarks' => $userBookmarks,
         ]);
     }
 }
