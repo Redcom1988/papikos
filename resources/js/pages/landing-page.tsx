@@ -47,6 +47,11 @@ export default function LandingPage() {
     });
     const [loading, setLoading] = useState(false);
 
+    // Calculate random room index only once when component mounts or rooms change
+    const [randomRoomIndex] = useState(() => 
+        rooms.length > 0 ? Math.floor(Math.random() * rooms.length) : 0
+    );
+
     // Use the bookmark hook
     const { bookmarkedRooms, bookmarkLoading, handleBookmark, isBookmarked } = useBookmarks(userBookmarks);
 
@@ -167,44 +172,68 @@ export default function LandingPage() {
                 </header>
 
                 {/* Hero Section */}
-                <section className="bg-background py-16">
+                <section className="bg-background py-8">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-12">
-                            <h1 className="text-4xl font-bold text-foreground mb-4">
-                                Find the Perfect Temporary<br />
-                                Housing for You
-                            </h1>
-                        </div>
-                        
-                        {/* Hero Content with Stats */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                            {/* Left side - Image */}
-                            <div className="relative">
-                                <div className="bg-muted rounded-lg h-80 flex items-center justify-center">
-                                    <div className="text-center">
-                                        <div className="w-16 h-16 bg-muted-foreground/20 rounded-lg mx-auto mb-4"></div>
-                                        <h3 className="text-xl font-semibold text-foreground mb-2">
-                                            We are Here<br />
-                                            For You.
-                                        </h3>
-                                    </div>
-                                </div>
+                        {/* Full Width Hero Image with overlaid content */}
+                        <div className="relative h-128 rounded-lg overflow-hidden">
+                            {rooms.length > 0 ? (
+                                <RoomImage
+                                    src={rooms[randomRoomIndex]?.primary_image}
+                                    alt="Featured room"
+                                    className="h-full w-full"
+                                    objectFit="cover"
+                                    loadingSize="lg"
+                                />
+                            ) : (
+                                <div className="bg-muted h-full"></div>
+                            )}
+                            
+                            {/* Dark overlay for better text readability */}
+                            <div className="absolute inset-0 bg-black/40"></div>
+                            
+                            {/* Main title - Top center */}
+                            <div className="absolute top-6 left-1/2 transform -translate-x-1/2 text-center"> {/* Changed from top-8 to top-6 */}
+                                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                                    Find the Perfect Temporary<br />
+                                    Housing for You
+                                </h1>
                             </div>
-
-                            {/* Right side - Stats */}
-                            <div className="space-y-8">
-                                <div className="text-center lg:text-right">
-                                    <div className="text-4xl font-bold text-foreground">
+                            
+                            {/* "We are here for you" - Bottom left */}
+                            <div className="absolute bottom-6 left-6"> {/* Changed from bottom-8 left-8 to bottom-6 left-6 */}
+                                <h3 className="text-2xl font-bold text-white">
+                                    We are Here<br />
+                                    For You.
+                                </h3>
+                            </div>
+                            
+                            {/* Stats - Bottom right */}
+                            <div className="absolute right-6 bottom-6 space-y-4"> {/* Changed from right-8 bottom-8 to right-6 bottom-6 */}
+                                <div className="text-right">
+                                    <div className="text-4xl font-bold text-white">
                                         {rooms.length || '12,550'}+
                                     </div>
-                                    <div className="text-muted-foreground">Property Available</div>
+                                    <div className="text-white/80">Property Available</div>
                                 </div>
                                 
-                                <div className="text-center lg:text-right">
-                                    <div className="text-4xl font-bold text-foreground">500+</div>
-                                    <div className="text-muted-foreground">Total Owners</div>
+                                <div className="text-right">
+                                    <div className="text-4xl font-bold text-white">500+</div>
+                                    <div className="text-white/80">Total Owners</div>
                                 </div>
                             </div>
+                            
+                            {/* Fallback content when no image */}
+                            {rooms.length === 0 && (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="text-center">
+                                        <div className="w-16 h-16 bg-muted-foreground/20 rounded-lg mx-auto mb-4"></div>
+                                        <h1 className="text-4xl font-bold text-foreground mb-4">
+                                            Find the Perfect Temporary<br />
+                                            Housing for You
+                                        </h1>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
