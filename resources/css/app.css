@@ -73,79 +73,82 @@
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        border-color: var(--color-border, currentColor);
     }
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+    /* Light Mode - Clean & Bright like the images */
+    --background: oklch(100% 0 0);                    /* Pure white background */
+    --foreground: oklch(15% 0 0);                     /* Very dark text for contrast */
+    --card: oklch(100% 0 0);                          /* Pure white cards */
+    --card-foreground: oklch(15% 0 0);                /* Dark text on cards */
+    --popover: oklch(100% 0 0);                       /* White popovers */
+    --popover-foreground: oklch(15% 0 0);             /* Dark text on popovers */
+    --primary: oklch(57% 0.2 258);                    /* Modern blue primary - like the "More property" button */
+    --primary-foreground: oklch(100% 0 0);            /* White text on primary */
+    --secondary: oklch(96% 0 0);                      /* Very light gray */
+    --secondary-foreground: oklch(15% 0 0);           /* Dark text on secondary */
+    --muted: oklch(97% 0 0);                          /* Subtle gray background - like the filter sidebar */
+    --muted-foreground: oklch(55% 0 0);               /* Medium gray text */
+    --accent: oklch(94% 0 0);                         /* Light accent color */
+    --accent-foreground: oklch(15% 0 0);              /* Dark text on accent */
+    --destructive: oklch(60% 0.25 25);                /* Red for destructive actions */
+    --destructive-foreground: oklch(100% 0 0);        /* White text on destructive */
+    --border: oklch(90% 0 0);                         /* Light gray borders */
+    --input: oklch(98% 0 0);                          /* Very light input background */
+    --ring: oklch(57% 0.2 258);                       /* Primary color for focus rings */
+    --chart-1: oklch(65% 0.22 41);                    /* Chart color 1 */
+    --chart-2: oklch(60% 0.12 185);                   /* Chart color 2 */
+    --chart-3: oklch(40% 0.07 227);                   /* Chart color 3 */
+    --chart-4: oklch(83% 0.19 84);                    /* Chart color 4 */
+    --chart-5: oklch(77% 0.19 70);                    /* Chart color 5 */
+    --radius: 0.75rem;                                /* Slightly larger radius for modern look */
+    --sidebar: oklch(99% 0 0);                        /* Almost white sidebar */
+    --sidebar-foreground: oklch(15% 0 0);             /* Dark sidebar text */
+    --sidebar-primary: oklch(57% 0.2 258);            /* Primary color in sidebar */
+    --sidebar-primary-foreground: oklch(100% 0 0);    /* White text on sidebar primary */
+    --sidebar-accent: oklch(96% 0 0);                 /* Light accent in sidebar */
+    --sidebar-accent-foreground: oklch(15% 0 0);      /* Dark text on sidebar accent */
+    --sidebar-border: oklch(92% 0 0);                 /* Subtle sidebar borders */
+    --sidebar-ring: oklch(57% 0.2 258);               /* Primary color for sidebar focus */
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    /* Dark Mode - Warmer & More Comfortable */
+    --background: oklch(16% 0.014 285);               /* Warmer dark blue-gray background */
+    --foreground: oklch(95% 0.006 285);               /* Slightly warm white text */
+    --card: oklch(20% 0.016 285);                     /* Warmer elevated surfaces */
+    --card-foreground: oklch(92% 0.006 285);          /* Warm white text on cards */
+    --popover: oklch(18% 0.015 285);                  /* Slightly warmer popovers */
+    --popover-foreground: oklch(95% 0.006 285);       /* Light text on popovers */
+    --primary: oklch(70% 0.18 258);                   /* Bright blue for dark mode */
+    --primary-foreground: oklch(98% 0 0);             /* White text on primary */
+    --secondary: oklch(28% 0.018 285);                /* Warmer secondary */
+    --secondary-foreground: oklch(92% 0.006 285);     /* Light text on secondary */
+    --muted: oklch(24% 0.016 285);                    /* Warmer muted background */
+    --muted-foreground: oklch(70% 0.012 285);         /* Warmer medium text */
+    --accent: oklch(32% 0.02 285);                    /* Warmer accent */
+    --accent-foreground: oklch(95% 0.006 285);        /* Light text on accent */
+    --destructive: oklch(58% 0.22 25);                /* Red for dark mode */
+    --destructive-foreground: oklch(98% 0 0);         /* Light text on destructive */
+    --border: oklch(35% 0.022 285);                   /* Warmer borders with better contrast */
+    --input: oklch(22% 0.016 285);                    /* Warmer input background */
+    --ring: oklch(70% 0.18 258);                      /* Bright primary for focus rings */
+    --chart-1: oklch(70% 0.24 264);                   /* Adjusted chart colors for dark mode */
+    --chart-2: oklch(70% 0.17 162);                   
+    --chart-3: oklch(77% 0.19 70);                    
+    --chart-4: oklch(63% 0.27 304);                   
+    --chart-5: oklch(65% 0.25 16);                    
+    --radius: 0.75rem;                                /* Same radius as light mode */
+    --sidebar: oklch(14% 0.012 285);                  /* Warmer darker sidebar */
+    --sidebar-foreground: oklch(90% 0.006 285);       /* Light sidebar text */
+    --sidebar-primary: oklch(70% 0.18 258);           /* Bright primary in sidebar */
+    --sidebar-primary-foreground: oklch(98% 0 0);     /* White text on sidebar primary */
+    --sidebar-accent: oklch(26% 0.018 285);           /* Warmer accent in sidebar */
+    --sidebar-accent-foreground: oklch(90% 0.006 285); /* Light text on sidebar accent */
+    --sidebar-border: oklch(32% 0.02 285);            /* Better contrast borders */
+    --sidebar-ring: oklch(70% 0.18 258);              /* Bright primary for sidebar focus */
 }
 
 @layer base {
@@ -155,5 +158,63 @@
 
     body {
         @apply bg-background text-foreground;
+        /* Smooth transition for theme changes */
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Enhanced scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--muted);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--muted-foreground);
+        border-radius: 4px;
+        opacity: 0.5;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--foreground);
+        opacity: 0.7;
+    }
+
+    /* Improved focus styles */
+    :focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+        border-radius: var(--radius-sm);
+    }
+
+    /* Better selection styling */
+    ::selection {
+        background-color: var(--primary);
+        color: var(--primary-foreground);
+    }
+}
+
+/* Additional utility classes for the new design */
+@layer utilities {
+    .glass-effect {
+        backdrop-filter: blur(10px);
+        background-color: oklch(from var(--card) l c h / 0.9);
+        border: 1px solid oklch(from var(--border) l c h / 0.6);
+    }
+
+    .gradient-primary {
+        background: linear-gradient(135deg, var(--primary), oklch(from var(--primary) calc(l + 0.1) c h));
+    }
+
+    .shadow-soft {
+        box-shadow: 0 2px 12px oklch(from var(--foreground) l c h / 0.08);
+    }
+
+    .shadow-soft-dark {
+        box-shadow: 0 4px 20px oklch(from var(--background) calc(l - 0.02) c h / 0.4);
     }
 }
