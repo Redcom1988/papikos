@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Room;
 use App\Models\Appointment;
+use App\Models\Bookmark;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -14,10 +15,20 @@ class RoomController extends Controller
     public function show(Request $request, $roomId): Response
     {
         try {
-            $roomDetails = Room::getRoomDetails($roomId);
+            // Keep using getRoomDetails as you originally had
+            $room = Room::getRoomDetails($roomId);
             
+            // Add the missing user bookmarks functionality
+            $userBookmarks = [];
+            if (Auth::check()) {
+                $userBookmarks = Bookmark::where('user_id', Auth::id())
+                    ->pluck('room_id')
+                    ->toArray();
+            }
+
             return Inertia::render('room-details-page', [
-                'room' => $roomDetails,
+                'room' => $room,
+                'userBookmarks' => $userBookmarks, // This was missing
             ]);
         } catch (\Exception $e) {
             abort(404, 'Room not found');
