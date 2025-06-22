@@ -115,12 +115,20 @@ class Room extends Model
                 'rating' => round($room->averageRating(), 1),
                 'reviewCount' => $room->reviews->count(),
                 'images' => $room->images->pluck('url')->toArray(),
-                'facilities' => $room->facilities->pluck('name')->toArray(),
+                // Updated to return facility objects
+                'facilities' => $room->facilities->map(function ($facility) {
+                    return [
+                        'id' => $facility->id,
+                        'name' => $facility->name,
+                        'description' => $facility->description,
+                        'icon' => $facility->icon,
+                    ];
+                })->toArray(),
                 'description' => $room->description,
+                'availableTours' => ['09:00', '14:00', '16:00', '18:00'],
+                'primary_image' => $room->primaryImage?->url,
                 'size' => $room->size,
                 'max_occupancy' => $room->max_occupancy,
-                'primary_image' => $room->primaryImage?->url,
-                'available_tours' => ['09:00', '14:00', '16:00', '18:00'],
             ];
         });
     }
@@ -149,7 +157,15 @@ class Room extends Model
                     'is_primary' => $image->is_primary,
                 ];
             })->toArray(),
-            'facilities' => $room->facilities->pluck('name')->toArray(),
+            // Updated to return facility objects instead of just names
+            'facilities' => $room->facilities->map(function ($facility) {
+                return [
+                    'id' => $facility->id,
+                    'name' => $facility->name,
+                    'description' => $facility->description,
+                    'icon' => $facility->icon,
+                ];
+            })->toArray(),
             'owner' => [
                 'id' => $room->owner->id,
                 'name' => $room->owner->name,
