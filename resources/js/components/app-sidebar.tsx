@@ -24,6 +24,7 @@ import {
     Users,
     User,
     Flag,
+    MessageCircle
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -113,6 +114,11 @@ export function AppSidebar() {
                     href: '/owner/reports',
                     icon: Flag,
                 },
+                {
+                    title: 'Messages',
+                    href: '/messages',
+                    icon: MessageCircle,
+                },
             ]
         }
     ];
@@ -125,7 +131,6 @@ export function AppSidebar() {
     } else if (user.role === 'owner') {
         sections = ownerSections;
     } 
-    console.log(user.role)
 
     const footerNavItems: NavItem[] = [
         {

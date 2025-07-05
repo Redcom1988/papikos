@@ -13,6 +13,11 @@ class Message extends Model
         'message'
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function sender(): BelongsTo
     {
         return $this->belongsTo(User::class, 'sender');

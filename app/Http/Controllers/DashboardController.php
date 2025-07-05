@@ -49,7 +49,7 @@ class DashboardController extends Controller
                 ];
             });
 
-        return Inertia::render('admin-dashboard', [
+        return Inertia::render('dashboard/admin-dashboard', [
             'stats' => [
                 'total_users' => $allUsers->count(),
                 'total_owners' => $owners->count(),
@@ -102,7 +102,7 @@ class DashboardController extends Controller
                 })
             : collect([]);
         
-        return Inertia::render('owner-dashboard', [
+        return Inertia::render('dashboard/owner-dashboard', [
             'stats' => [
                 'total_rooms' => $rooms->count(),
                 'available_rooms' => $rooms->where('is_available', true)->count(),
