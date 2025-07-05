@@ -1,4 +1,4 @@
-import { type SharedData } from '@/types';
+import type { RoomDetailsPageProps } from '@/types';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { 
@@ -6,92 +6,54 @@ import {
     ArrowRight, 
     ChevronRight, 
     Star, 
-    BarChart3, 
     Home, 
     Globe 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import ImageGallery from '@/components/ui/image-gallery';
-import Modal from '@/components/ui/modal';
 import OwnerCard from '@/components/ui/owner-card';
 import { useBookmarks } from '@/hooks/use-bookmarks';
 import BookmarkButton from '@/components/ui/bookmark-button';
-import IconButton from '@/components/ui/icon-button';
-
-// Update the RoomDetails interface
-interface RoomDetails {
-    id: number;
-    title: string;
-    description: string;
-    price: number;
-    location: string;
-    embedded_map_link?: string;
-    size: number;
-    max_occupancy: number;
-    rating: number;
-    reviewCount: number;
-    images: Array<{
-        id: number;
-        url: string;
-        caption: string;
-        is_primary: boolean;
-    }>;
-    // Updated facilities to be objects instead of strings
-    facilities: Array<{
-        id: number;
-        name: string;
-        description?: string;
-        icon?: string;
-    }>;
-    owner: {
-        id: number;
-        name: string;
-        phone: string;
-    };
-    reviews: Array<{
-        id: number;
-        user_name: string;
-        overall_rating: number;
-        cleanliness_rating: number;
-        security_rating: number;
-        comfort_rating: number;
-        value_rating: number;
-        comment: string;
-        created_at: string;
-        images: string[];
-    }>;
-    available_tours: string[];
-}
-
-interface PageProps extends SharedData {
-    room: RoomDetails;
-    userBookmarks?: number[]; // Add this
-}
+import AppBar from '@/components/ui/appbar';
+import Tag from '@/components/ui/tag';
+import { Breadcrumbs } from '@/components/breadcrumbs';
 
 export default function RoomDetailsPage() {
-    const { auth, room, userBookmarks = [] } = usePage<PageProps>().props;
+    const { auth, room, userBookmarks = [] } = usePage<RoomDetailsPageProps>().props;
     
     // Use the bookmark hook
     const { bookmarkedRooms, bookmarkLoading, handleBookmark, isBookmarked } = useBookmarks(userBookmarks);
-    const [showScheduleModal, setShowScheduleModal] = useState(false);
-    const [showReportModal, setShowReportModal] = useState(false);
+    const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+    const [showReportDialog, setShowReportDialog] = useState(false);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
     const [surveyMessage, setSurveyMessage] = useState('');
     const [wantFinancingInfo, setWantFinancingInfo] = useState(false);
     const [reportType, setReportType] = useState('');
     const [reportDescription, setReportDescription] = useState('');
-    const [reviewRatings, setReviewRatings] = useState({
-        cleanliness: 3,
-        security: 3,
-        comfort: 3,
-        value: 3
-    });
     const [reviewMessage, setReviewMessage] = useState('');
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('id-ID', {
             minimumFractionDigits: 0
         }).format(price);
+    };
+
+    const handleReviewSubmit = async () => {
+        if (!auth.user) {
+            router.visit(route('login'));
+            return;
+        } else {
+            alert('Review submitted successfully!'); // TODO: Implement actual review submission
+        }
     };
 
     const handleScheduleSurvey = async () => {
@@ -124,7 +86,7 @@ export default function RoomDetailsPage() {
             
             if (response.ok) {
                 alert(`Survey scheduled successfully for ${selectedTimeSlot}`);
-                setShowScheduleModal(false);
+                setShowScheduleDialog(false);
                 setSelectedTimeSlot('');
                 setSurveyMessage('');
                 setWantFinancingInfo(false);
@@ -150,40 +112,28 @@ export default function RoomDetailsPage() {
             router.visit(route('login'));
             return;
         }
-        setShowScheduleModal(true);
+        setShowScheduleDialog(true);
     }
 
-    const handleRatingClick = (category: string, rating: number) => {
-        setReviewRatings(prev => ({
-            ...prev,
-            [category]: rating
-        }));
+    const handleSubmitReport = () => {
+        if (!reportType) {
+            alert('Please select a report type');
+            return;
+        }
+        
+        // TODO: Implement actual report submission
+        alert('Report submitted successfully');
+        setShowReportDialog(false);
+        setReportType('');
+        setReportDescription('');
     };
 
-    const timeSlots = [
-        { label: 'Min, Jul 2', time: '11:00 Wita - 1:00 Wita' },
-        { label: 'Rab, Jul 5', time: '2:00 Wita - 4:00 Wita' },
-        { label: 'Rab, Jul 5', time: '2:00 Wita - 4:00 Wita' },
-        { label: 'Rab, Jul 5', time: '2:00 Wita - 4:00 Wita' },
-    ];
-
-    // Ensure page can scroll
+    // Also add scroll restoration when dialog close
     useEffect(() => {
-        // Force restore scroll on component mount
-        document.body.style.overflow = 'auto';
-        
-        // Cleanup on unmount
-        return () => {
-            document.body.style.overflow = 'auto';
-        };
-    }, []);
-
-    // Also add scroll restoration when modals close
-    useEffect(() => {
-        if (!showScheduleModal && !showReportModal) {
+        if (!showScheduleDialog && !showReportDialog) {
             document.body.style.overflow = 'auto';
         }
-    }, [showScheduleModal, showReportModal]);
+    }, [showScheduleDialog, showReportDialog]);
 
     return (
         <>
@@ -192,86 +142,19 @@ export default function RoomDetailsPage() {
             </Head>
             
             <div className="min-h-screen bg-background text-foreground overflow-auto">
-                {/* Header */}
-                <header className="bg-background border-b border-border">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between items-center h-16">
-                            <div className="flex items-center">
-                                <Link href={route('landing.page')} className="flex items-center">
-                                    <img 
-                                        src="/logo.png" 
-                                        alt="Papikos Logo" 
-                                        className="w-8 h-8 mr-3"
-                                    />
-                                    <span className="text-xl font-semibold text-foreground">papikos</span>
-                                </Link>
-                            </div>
+                {/* Header - Using AppBar component */}
+                <AppBar auth={auth} />
 
-                            <nav className="flex items-center space-x-6">
-                                {auth.user ? (
-                                    <div className="flex items-center space-x-2">
-                                        {/* Profile Button */}
-                                        <button 
-                                            onClick={() => router.visit(route('profile.edit'))}
-                                            className="flex items-center space-x-2 bg-background border border-border text-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-muted transition-colors"
-                                            title="Profile"
-                                        >
-                                            <span>{auth.user.name}</span>
-                                            <div className="w-5 h-5 bg-muted rounded-full flex items-center justify-center">
-                                                <span className="text-xs font-medium text-muted-foreground">{auth.user.name?.charAt(0)}</span>
-                                            </div>
-                                        </button>
-                                        {/* Dashboard Button - Updated with BarChart3 icon */}
-                                        <button
-                                            onClick={() => router.visit(route('dashboard'))}
-                                            className="flex items-center space-x-2 bg-background border border-border text-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-muted transition-colors"
-                                            title="Dashboard"
-                                        >
-                                            <span>Dashboard</span>
-                                            <div className="w-5 h-5 bg-muted rounded-full flex items-center justify-center">
-                                                <BarChart3 className="w-3 h-3 text-muted-foreground" />
-                                            </div>
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center space-x-2">
-                                        {/* Login Button */}
-                                        <button
-                                            onClick={() => router.visit(route('login'))}
-                                            className="bg-background border border-border text-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-muted transition-colors"
-                                        >
-                                            Log in
-                                        </button>
-                                        
-                                        {/* Register Button */}
-                                        <button
-                                            onClick={() => router.visit(route('register'))}
-                                            className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
-                                        >
-                                            Sign up
-                                        </button>
-                                    </div>
-                                )}
-                            </nav>
-                        </div>
-                    </div>
-                </header>
-
-                {/* Breadcrumb - Updated to match room listings style */}
                 <div className="bg-muted/50 py-3">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex items-center text-sm">
-                            <Link href={route('landing.page')} className="text-muted-foreground hover:text-foreground transition-colors">
-                                Home
-                            </Link>
-                            <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground" />
-                            <Link href={route('rooms.index')} className="text-muted-foreground hover:text-foreground transition-colors">
-                                Room Listings
-                            </Link>
-                            <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground" />
-                            <span className="text-foreground font-medium">{room.title}</span>
-                        </div>
-                    </div>
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <Breadcrumbs
+                      breadcrumbs={[
+                        { title: 'Home', href: route('landing.page') },
+                        { title: 'Room Listings', href: route('rooms.index') },
+                        { title: room.title, href: route('room.show', room.id) }
+                      ]}
+                    />
+                  </div>
                 </div>
 
                 {/* Main Content */}
@@ -295,17 +178,18 @@ export default function RoomDetailsPage() {
                                 
                                 {/* Right side content - stacked vertically */}
                                 <div className="flex flex-col items-end space-y-3">
-                                    {/* Icons Row - Updated with consistent styling */}
+                                    {/* Icons Row */}
                                     <div className="flex items-center space-x-3">
-                                        {/* Report Button - Now matches bookmark styling */}
-                                        <IconButton
-                                            onClick={() => setShowReportModal(true)}
+                                        {/* Report Button */}
+                                        <Button
+                                            variant="icon"
+                                            size="icon"
+                                            onClick={() => setShowReportDialog(true)}
                                             title="Report this listing"
                                         >
-                                            <Flag className="w-4 h-4 text-red-500" />
-                                        </IconButton>
+                                            <Flag className="w-4 h-4" />
+                                        </Button>
                                         
-                                        {/* Bookmark Button */ }
                                         <BookmarkButton
                                             roomId={room.id}
                                             isBookmarked={isBookmarked(room.id)}
@@ -314,12 +198,6 @@ export default function RoomDetailsPage() {
                                             size="md"
                                         />
                                         
-                                        {/* Rating Display - Updated with Star icon */}
-                                        <div className="flex items-center space-x-1 bg-card border border-border rounded-full px-3 shadow-sm h-8 min-w-fit">
-                                            <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                                            <span className="font-medium text-sm text-card-foreground">{room.rating}</span>
-                                            <span className="text-muted-foreground text-xs">({room.reviewCount})</span>
-                                        </div>
                                     </div>
 
                                     {/* Action Buttons */}
@@ -337,7 +215,8 @@ export default function RoomDetailsPage() {
                                             variant="outline" 
                                             onClick={handleSurveySchedule}
                                             size="lg"
-                                            className="border-border text-foreground hover:bg-muted"
+                                            disabled={room.available_tours.length === 0}
+                                            className="border-border text-foreground hover:bg-muted disabled:opacity-50"
                                         >
                                             Schedule A Survey
                                         </Button>
@@ -346,19 +225,20 @@ export default function RoomDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Room Highlights - Updated to handle facility objects */}
+                        {/* Room Facilities */}
                         <div className="mb-8">
-                            <h3 className="text-lg font-semibold text-foreground mb-4">Room Highlights</h3>
+                            <h3 className="text-lg font-semibold text-foreground mb-4">Room Facilities</h3>
                             
                             {room.facilities && room.facilities.length > 0 ? (
                                 <div className="flex flex-wrap gap-2">
                                     {room.facilities.map((facility) => (
-                                        <span 
+                                        <Tag
                                             key={facility.id}
-                                            className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
+                                            variant="primary"
+                                            icon={facility.icon ? <span className="text-xs">{facility.icon}</span> : undefined}
                                         >
                                             {facility.name}
-                                        </span>
+                                        </Tag>
                                     ))}
                                 </div>
                             ) : (
@@ -396,186 +276,122 @@ export default function RoomDetailsPage() {
                                 </div>
                             </div>
                         )}
-
-                        {/* Leave Review */}
-                        <div className="mb-8">
-                            <h3 className="text-lg font-semibold text-foreground mb-6">Leave A Review!</h3>
-                            <div className="grid grid-cols-4 gap-6 mb-6">
-                                {Object.entries({
-                                    cleanliness: 'Cleanliness Rating',
-                                    security: 'Security Rating',
-                                    comfort: 'Comfort Rating',
-                                    value: 'Value Rating'
-                                }).map(([key, label]) => (
-                                    <div key={key} className="text-center">
-                                        <p className="text-sm font-medium text-foreground mb-3">{label}</p>
-                                        <div className="flex justify-center space-x-1">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <button
-                                                    key={star}
-                                                    onClick={() => handleRatingClick(key, star)}
-                                                    className={`transition-colors hover:scale-110 ${
-                                                        star <= reviewRatings[key as keyof typeof reviewRatings]
-                                                            ? 'text-yellow-400'
-                                                            : 'text-muted-foreground/30'
-                                                    }`}
-                                                >
-                                                    <Star className={`w-6 h-6 ${
-                                                        star <= reviewRatings[key as keyof typeof reviewRatings]
-                                                            ? 'fill-current'
-                                                            : ''
-                                                    }`} />
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
-
-                                <div className="col-span-4">
-                                    <label className="block text-sm font-medium text-foreground mb-2">Message (optional)</label>
-                                    <textarea
-                                        value={reviewMessage}
-                                        onChange={(e) => setReviewMessage(e.target.value)}
-                                        placeholder="Enter message"
-                                        className="w-full p-4 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
-                                        rows={4}
-                                    />
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </main>
 
-                {/* Schedule Survey Modal */}
-                <Modal
-                    isOpen={showScheduleModal}
-                    onClose={() => setShowScheduleModal(false)}
-                    title="Schedule A Survey"
-                >
-                    <p className="text-sm text-muted-foreground mb-6">
-                        Schedule a tour to see if the place is the right one for you.
-                    </p>
+                {/* Schedule Survey Dialog */}
+                <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
+                    <DialogContent className="sm:max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>Schedule A Survey</DialogTitle>
+                            <DialogDescription>
+                                Schedule a tour to see if the place is the right one for you.
+                            </DialogDescription>
+                        </DialogHeader>
 
-                    <div className="mb-6">
-                        <h4 className="font-medium text-foreground mb-3">Select a preferred time</h4>
-                        <div className="grid grid-cols-2 gap-3">
-                            {timeSlots.map((slot, index) => (
-                                <Button
-                                    key={index}
-                                    variant={selectedTimeSlot === `${slot.label} ${slot.time}` ? "default" : "outline"}
-                                    onClick={() => setSelectedTimeSlot(`${slot.label} ${slot.time}`)}
-                                    className="h-auto p-3 text-left flex-col items-start"
-                                >
-                                    <div className="font-medium">{slot.label}</div>
-                                    <div className="text-xs opacity-70">{slot.time}</div>
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-foreground mb-2">Message (optional)</label>
-                        <textarea
-                            value={surveyMessage}
-                            onChange={(e) => setSurveyMessage(e.target.value)}
-                            placeholder="Enter message"
-                            className="w-full p-3 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
-                            rows={3}
-                        />
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={wantFinancingInfo}
-                                onChange={(e) => setWantFinancingInfo(e.target.checked)}
-                                className="h-4 w-4 text-primary border-border rounded focus:ring-primary"
-                            />
-                            <span className="ml-2 text-sm text-foreground">I want financing information</span>
-                        </label>
-                    </div>
-
-                    <Button
-                        onClick={handleScheduleSurvey}
-                        disabled={!selectedTimeSlot}
-                        className="w-full"
-                    >
-                        Request this time
-                    </Button>
-                </Modal>
-
-                {/* Report Listing Modal */}
-                <Modal
-                    isOpen={showReportModal}
-                    onClose={() => setShowReportModal(false)}
-                    title="Report This Listing"
-                >
-                    <p className="text-sm text-muted-foreground mb-6">
-                        Report this listing for untrustworthy behavior. Thank you for taking your time to do so.
-                    </p>
-
-                    <div className="mb-6">
-                        <h4 className="font-medium text-foreground mb-3">Select a Report Type</h4>
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                            {['Inappropriate Content', 'Fake Listing', 'Spam', 'Other'].map((type) => (
-                                <Button
-                                    key={type}
-                                    variant={reportType === type ? "default" : "outline"}
-                                    onClick={() => setReportType(type)}
-                                    className="text-center"
-                                >
-                                    {type}
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-foreground mb-2">Description</label>
-                        <textarea
-                            value={reportDescription}
-                            onChange={(e) => setReportDescription(e.target.value)}
-                            placeholder="Enter message"
-                            className="w-full p-3 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
-                            rows={4}
-                        />
-                    </div>
-
-                    <Button
-                        onClick={handleRent}
-                        disabled={!reportType}
-                        className="w-full"
-                    >
-                        Submit Report
-                    </Button>
-                </Modal>
-
-                {/* Footer - Updated with Lucide icons */}
-                <footer className="bg-background border-t border-border py-8">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center">
-                                <div className="w-8 h-8 bg-primary rounded mr-3 flex items-center justify-center">
-                                    <Home className="w-4 h-4 text-primary-foreground" />
-                                </div>
-                                <span className="font-medium text-foreground">Logo</span>
-                            </div>
+                        <div className="space-y-6">
                             <div>
-                                <span className="text-sm text-muted-foreground">Company</span>
+                                <h4 className="font-medium text-foreground mb-3">Select a preferred time</h4>
+                                {room.available_tours.length > 0 ? (
+                                    <div className="grid grid-cols-4 gap-3">
+                                        {room.available_tours.map((slot, index) => (
+                                            <Button
+                                                key={index}
+                                                variant={selectedTimeSlot === slot.datetime ? "default" : "outline"}
+                                                onClick={() => setSelectedTimeSlot(slot.datetime)}
+                                                className="h-auto py-3 px-2 text-left flex-col items-start w-full min-h-[70px]"
+                                            >
+                                                <div className="font-medium text-xs leading-tight break-words">{slot.label}</div>
+                                                <div className="text-xs opacity-70 mt-1 break-words">{slot.display_time}</div>
+                                            </Button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-4 text-muted-foreground">
+                                        Tours are not available for this room
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                        <div className="pt-4 border-t border-border">
-                            <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
-                                <select className="border-none bg-transparent text-sm text-muted-foreground">
-                                    <option>English</option>
-                                </select>
-                                <span>© 2022 Brand, Inc. • Privacy • Terms • Sitemap</span>
-                                <Globe className="w-4 h-4" />
+
+                            <div>
+                                <label className="block text-sm font-medium text-foreground mb-2">Message (optional)</label>
+                                <Input
+                                    value={surveyMessage}
+                                    onChange={(e) => setSurveyMessage(e.target.value)}
+                                    placeholder="Enter message"
+                                    className="resize-none"
+                                />
                             </div>
+
+                            <div>
+                                <label className="flex items-center">
+                                    <Checkbox
+                                        checked={wantFinancingInfo}
+                                        onCheckedChange={(checked) => setWantFinancingInfo(checked === true)}
+                                    />
+                                    <span className="ml-2 text-sm text-foreground">I want financing information</span>
+                                </label>
+                            </div>
+
+                            <Button
+                                onClick={handleScheduleSurvey}
+                                disabled={!selectedTimeSlot}
+                                className="w-full"
+                            >
+                                Request this time
+                            </Button>
                         </div>
-                    </div>
-                </footer>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Report Listing Dialog */}
+                <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+                    <DialogContent className="sm:max-w-lg">
+                        <DialogHeader>
+                            <DialogTitle>Report This Listing</DialogTitle>
+                            <DialogDescription>
+                                Report this listing for untrustworthy behavior. Thank you for taking your time to do so.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="space-y-6">
+                            <div>
+                                <h4 className="font-medium text-foreground mb-3">Select a Report Type</h4>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {['Inappropriate Content', 'Fake Listing', 'Spam', 'Other'].map((type) => (
+                                        <Button
+                                            key={type}
+                                            variant={reportType === type ? "default" : "outline"}
+                                            onClick={() => setReportType(type)}
+                                            className="text-center w-full min-h-[44px] px-3 py-2 text-sm leading-tight break-words"
+                                        >
+                                            {type}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-foreground mb-2">Description</label>
+                                <textarea
+                                    value={reportDescription}
+                                    onChange={(e) => setReportDescription(e.target.value)}
+                                    placeholder="Enter message"
+                                    className="w-full p-3 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
+                                    rows={4}
+                                />
+                            </div>
+
+                            <Button
+                                onClick={handleSubmitReport}
+                                disabled={!reportType}
+                                className="w-full"
+                            >
+                                Submit Report
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             </div>
         </>
     );
