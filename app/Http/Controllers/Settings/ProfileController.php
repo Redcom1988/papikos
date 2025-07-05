@@ -14,11 +14,22 @@ use Inertia\Response;
 class ProfileController extends Controller
 {
     /**
-     * Show the user's profile settings page.
+     * Show the user's profile settings page (standalone).
      */
     public function edit(Request $request): Response
     {
         return Inertia::render('settings/profile', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'status' => $request->session()->get('status'),
+        ]);
+    }
+
+    /**
+     * Show the user's profile settings page (dashboard).
+     */
+    public function editDashboard(Request $request): Response
+    {
+        return Inertia::render('dashboard/settings/profile', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);
@@ -36,6 +47,11 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        // Determine redirect based on the route used
+        if ($request->route()->getName() === 'dashboard.profile.update') {
+            return to_route('dashboard.profile.edit');
+        }
 
         return to_route('profile.edit');
     }

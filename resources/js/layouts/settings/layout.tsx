@@ -2,35 +2,44 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { Lock, Palette, User } from 'lucide-react';
 import { type PropsWithChildren } from 'react';
 
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: '/settings/profile',
-        icon: null,
-    },
-    {
-        title: 'Password',
-        href: '/settings/password',
-        icon: null,
-    },
-    {
-        title: 'Appearance',
-        href: '/settings/appearance',
-        icon: null,
-    },
-];
+interface SettingsLayoutProps {
+    children: React.ReactNode;
+}
 
-export default function SettingsLayout({ children }: PropsWithChildren) {
+export default function DashboardSettingsLayout({ children }: SettingsLayoutProps) {
+    const { auth } = usePage<SharedData>().props;
+    const currentPath = usePage().url;
+
+    const navItems = [
+        {
+            title: 'Profile',
+            href: route('dashboard.profile.edit'),
+            icon: User,
+            isActive: currentPath === '/dashboard/settings/profile'
+        },
+        {
+            title: 'Password',
+            href: route('dashboard.password.edit'),
+            icon: Lock,
+            isActive: currentPath === '/dashboard/settings/password'
+        },
+        {
+            title: 'Appearance',
+            href: route('dashboard.appearance'),
+            icon: Palette,
+            isActive: currentPath === '/dashboard/settings/appearance'
+        }
+    ];
+
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
         return null;
     }
-
-    const currentPath = window.location.pathname;
 
     return (
         <div className="px-4 py-6">
@@ -39,21 +48,22 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
                     <nav className="flex flex-col space-y-1 space-x-0">
-                        {sidebarNavItems.map((item, index) => (
-                            <Button
-                                key={`${item.href}-${index}`}
-                                size="sm"
-                                variant="ghost"
-                                asChild
-                                className={cn('w-full justify-start', {
-                                    'bg-muted': currentPath === item.href,
-                                })}
-                            >
-                                <Link href={item.href} prefetch>
-                                    {item.title}
-                                </Link>
-                            </Button>
-                        ))}
+                        {navItems.map((item) => {
+                            const Icon = item.icon;
+                            return (
+                                <Button
+                                    key={item.href}
+                                    variant={item.isActive ? "secondary" : "ghost"}
+                                    className="w-full justify-start"
+                                    asChild
+                                >
+                                    <Link href={item.href}>
+                                        <Icon className="w-4 h-4 mr-2" />
+                                        {item.title}
+                                    </Link>
+                                </Button>
+                            );
+                        })}
                     </nav>
                 </aside>
 

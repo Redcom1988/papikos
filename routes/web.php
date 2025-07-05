@@ -23,20 +23,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
     });
 
-    // Settings routes
-    Route::prefix('settings')->group(function () {
-        Route::redirect('/', 'settings/profile');
-
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-        
-        Route::get('/password', [PasswordController::class, 'edit'])->name('password.edit');
-        Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
-        
-        Route::get('/appearance', function () {
-            return Inertia::render('settings/appearance');
-        })->name('appearance.edit');
+    // Report routes
+    Route::prefix('reports')->group(function () {
+        Route::post('/', [App\Http\Controllers\ReportController::class, 'store'])->name('reports.store');
+        Route::get('/', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+        Route::get('/{report}', [App\Http\Controllers\ReportController::class, 'show'])->name('reports.show');
+        Route::patch('/{report}', [App\Http\Controllers\ReportController::class, 'update'])->name('reports.update');
+        Route::post('/{report}/respond', [App\Http\Controllers\ReportController::class, 'respond'])->name('reports.respond'); // Add this
     });
 });
 
@@ -48,3 +41,4 @@ Route::post('/api/tours/book', [RoomController::class, 'bookTour'])->name('tour.
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__.'/auth.php';
+require __DIR__.'/settings.php';
