@@ -3,9 +3,11 @@ import RoomImage from './room-image';
 
 interface HeroSectionProps {
     room: HeroRoom | null;
+    totalProperties: number;
+    totalOwners: number;
 }
 
-export default function HeroSection({ room }: HeroSectionProps) {
+export default function HeroSection({ room, totalProperties, totalOwners }: HeroSectionProps) {
     return (
         <section className="bg-background py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,14 +43,20 @@ export default function HeroSection({ room }: HeroSectionProps) {
                     <div className="absolute right-6 bottom-6 space-y-4">
                         <div className="text-right">
                             <div className="text-4xl font-bold text-white">
-                                12,550+
+                                {totalProperties.toLocaleString()}+
                             </div>
-                            <div className="text-white/80">Property Available</div>
+                            <div className="text-white/80">
+                                {totalProperties === 1 ? 'Property Available' : 'Properties Available'}
+                            </div>
                         </div>
                         
                         <div className="text-right">
-                            <div className="text-4xl font-bold text-white">500+</div>
-                            <div className="text-white/80">Total Owners</div>
+                            <div className="text-4xl font-bold text-white">
+                                {totalOwners.toLocaleString()}+
+                            </div>
+                            <div className="text-white/80">
+                                {totalOwners === 1 ? 'Total Owner' : 'Total Owners'}
+                            </div>
                         </div>
                     </div>
                     

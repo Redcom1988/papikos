@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { BarChart3, Settings } from 'lucide-react';
+import { BarChart3, Settings, Bookmark } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { Button } from './button';
 import ThemeSelector from './theme-selector-button';
@@ -57,6 +57,11 @@ export default function AppBar({ auth, className = '', sticky = false }: AppBarP
                                         <DropdownMenuItem onSelect={() => router.visit(route('profile.edit'))}>
                                             <Settings className="w-4 h-4 mr-2" />
                                             Settings
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem onSelect={() => router.visit(route('bookmarks.index'))}>
+                                            <Bookmark className="w-4 h-4 mr-2" />
+                                            My Bookmarks
                                         </DropdownMenuItem>
                                         
                                         {hasDashboardAccess && (
