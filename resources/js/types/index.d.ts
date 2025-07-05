@@ -36,11 +36,11 @@ export interface User {
     name: string;
     email: string;
     phone?: string;
-    is_owner: boolean;
+    role: 'admin' | 'owner' | 'renter';
+    is_admin?: boolean;
+    is_owner?: boolean;
     email_verified_at: string | null;
     created_at: string;
-    updated_at: string;
-    avatar?: string; // This might be computed/appended in Laravel
 }
 
 // Room and listings related interfaces
