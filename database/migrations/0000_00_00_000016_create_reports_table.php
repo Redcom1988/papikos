@@ -13,7 +13,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('reporter_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('room_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('owner_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->enum('type', ['inappropriate_content', 'fake_listing', 'fraud', 'safety_concern', 'other']);
             $table->text('description');
             $table->enum('status', ['pending', 'investigating', 'resolved', 'dismissed'])->default('pending');

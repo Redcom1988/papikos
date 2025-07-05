@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -48,26 +49,6 @@ class User extends Authenticatable
         return $this->hasMany(Appointment::class);
     }
 
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
-    }
-
-    public function ownerPayments()
-    {
-        return $this->hasMany(Payment::class, 'owner_id');
-    }
-
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
-    }
-
-    public function payoutMethods()
-    {
-        return $this->hasMany(PayoutMethod::class);
-    }
-
     public function reports()
     {
         return $this->hasMany(Report::class);
@@ -87,5 +68,10 @@ class User extends Authenticatable
     public function hasVerifiedEmail(): bool
     {
         return !is_null($this->email_verified_at);
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
     }
 }
