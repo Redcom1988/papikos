@@ -34,7 +34,6 @@ export default function BookmarkButton({
         <IconButton
             onClick={handleClick}
             title={isBookmarked ? "Remove from bookmarks" : "Add to bookmarks"}
-            variant={isBookmarked ? 'bookmarked' : 'default'}
             disabled={isLoading}
             className={className}
             size={size}
