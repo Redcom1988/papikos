@@ -1,6 +1,6 @@
 import type { RoomDetailsPageProps } from '@/types';
 import { Head, Link, usePage, router } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
     Flag, 
     ArrowRight, 
@@ -26,9 +26,11 @@ import BookmarkButton from '@/components/ui/bookmark-button';
 import AppBar from '@/components/ui/appbar';
 import Tag from '@/components/ui/tag';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import MobileChat, { type MobileChatRef } from '@/components/ui/mobile-chat';
 
 export default function RoomDetailsPage() {
     const { auth, room, userBookmarks = [] } = usePage<RoomDetailsPageProps>().props;
+    const mobileChatRef = useRef<MobileChatRef>(null);
     
     // Use the bookmark hook
     const { bookmarkedRooms, bookmarkLoading, handleBookmark, isBookmarked } = useBookmarks(userBookmarks);
@@ -39,7 +41,6 @@ export default function RoomDetailsPage() {
     const [wantFinancingInfo, setWantFinancingInfo] = useState(false);
     const [reportType, setReportType] = useState('');
     const [reportDescription, setReportDescription] = useState('');
-    const [reviewMessage, setReviewMessage] = useState('');
     const [reportImages, setReportImages] = useState<File[]>([]);
 
     const formatPrice = (price: number) => {
@@ -168,6 +169,20 @@ export default function RoomDetailsPage() {
         }
     }, [showScheduleDialog, showReportDialog]);
 
+    const handleMessageOwner = () => {
+        if (!auth.user) {
+            router.visit(route('login'));
+            return;
+        }
+        
+        // Open mobile chat with the owner
+        mobileChatRef.current?.openChatWithUser({
+            id: room.owner.id,
+            name: room.owner.name,
+            email: room.owner.email
+        });
+    };
+
     return (
         <>
             <Head title={`${room.title} - Papikos`}>
@@ -202,7 +217,7 @@ export default function RoomDetailsPage() {
                         <div className="mb-8">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex-1">
-                                    <h1 className="text-2xl font-semibold text-foreground mb-2">Kos {room.title}</h1>
+                                    <h1 className="text-2xl font-semibold text-foreground mb-2">{room.title}</h1>
                                     <div className="flex items-center space-x-4">
                                         <span className="text-xl font-bold text-foreground">{formatPrice(room.price)}/month</span>
                                         <span className="text-sm text-muted-foreground">Tidak termasuk listrik</span>
@@ -278,7 +293,7 @@ export default function RoomDetailsPage() {
                             <OwnerCard 
                                 owner={room.owner}
                                 description={room.description}
-                                onMessageClick={() => alert('Message feature coming soon!')}
+                                onMessageClick={handleMessageOwner}
                                 onCallClick={() => window.open(`tel:${room.owner.phone}`)}
                             />
                         </div>
@@ -441,6 +456,9 @@ export default function RoomDetailsPage() {
                         </div>
                     </DialogContent>
                 </Dialog>
+
+                {/* Mobile Chat Component */}
+                <MobileChat ref={mobileChatRef} />
             </div>
         </>
     );

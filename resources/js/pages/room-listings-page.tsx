@@ -17,6 +17,7 @@ import FilterSidebar from '@/components/ui/filter-sidebar';
 import RoomCard from '@/components/ui/room-card';
 import Pagination from '@/components/ui/pagination';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import MobileChat from '@/components/ui/mobile-chat';
 
 export default function RoomListings() {
     const { auth, rooms, facilities, filters: initialFilters, userBookmarks = [] } = usePage<RoomListingsPageProps>().props;
@@ -212,6 +213,9 @@ export default function RoomListings() {
                         </div>
                     </div>
                 </main>
+
+                {/* Mobile Chat Component */}
+                <MobileChat />
             </div>
         </>
     );

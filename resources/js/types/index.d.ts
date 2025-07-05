@@ -85,6 +85,7 @@ export interface RoomDetails {
         id: number;
         name: string;
         phone: string;
+        email: string;
     };
     available_tours: Array<{
         datetime: string;

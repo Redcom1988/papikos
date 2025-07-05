@@ -35,6 +35,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/{userId}', [MessageController::class, 'getMessages'])->name('messages.get');
         Route::post('/', [MessageController::class, 'store'])->name('messages.store');
     });
+
+    // Mobile chat API
+    Route::get('/api/chat-users', [MessageController::class, 'getChatUsers']);
+    Route::get('/api/users', [MessageController::class, 'getAllUsers']);
 });
 
 // Individual room routes - kept in RoomController for room-specific operations

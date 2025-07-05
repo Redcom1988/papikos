@@ -56,32 +56,33 @@ export default function Messages({ users }: MessagesProps) {
 
         setIsSending(true);
 
+        // Declare optimisticMessage here so it's accessible in catch block
+        const optimisticMessage = {
+            id: Date.now(),
+            sender: auth.user.id,
+            receiver: userId,
+            message: inputValue,
+            created_at: new Date(),
+            updated_at: new Date(),
+        };
+
         try {
             const payload = {
                 message: inputValue,
                 receiver: userId,
             };
 
-            // Add optimistic update
-            const optimisticMessage = {
-                id: Date.now(), // temporary ID
-                sender: auth.user.id,
-                receiver: userId,
-                message: inputValue,
-                created_at: new Date(),
-                updated_at: new Date(),
-            };
-
             setMessages((prev) => [...prev, optimisticMessage]);
             setInputValue('');
 
-            // Send to server
             await axios.post('/messages', payload);
             
-            // Refresh messages to get the real ID from server
-            fetchMessages(userId);
+            // Don't call fetchMessages with loader - just refresh silently
+            fetchMessages(userId, false);
         } catch (error) {
             console.error('Failed to send message:', error);
+            // Remove the optimistic message on error
+            setMessages((prev) => prev.filter(msg => msg.id !== optimisticMessage.id));
         } finally {
             setIsSending(false);
         }
@@ -180,19 +181,28 @@ export default function Messages({ users }: MessagesProps) {
                                                         message.sender === auth.user.id
                                                             ? 'bg-primary text-primary-foreground rounded-br-none'
                                                             : 'bg-muted rounded-bl-none'
+                                                    } ${
+                                                        // Add subtle opacity for optimistic messages
+                                                        message.id > 1000000000000 ? 'opacity-80' : ''
                                                     }`}
                                                 >
                                                     <p>{message.message}</p>
-                                                    <p className={`text-xs mt-1 ${
-                                                        message.sender === auth.user.id 
-                                                            ? 'text-primary-foreground/70' 
-                                                            : 'text-muted-foreground'
-                                                    }`}>
-                                                        {new Date(message.created_at).toLocaleTimeString([], {
-                                                            hour: '2-digit',
-                                                            minute: '2-digit'
-                                                        })}
-                                                    </p>
+                                                    <div className="flex items-center justify-between mt-1">
+                                                        <p className={`text-xs ${
+                                                            message.sender === auth.user.id 
+                                                                ? 'text-primary-foreground/70' 
+                                                                : 'text-muted-foreground'
+                                                        }`}>
+                                                            {new Date(message.created_at).toLocaleTimeString([], {
+                                                                hour: '2-digit',
+                                                                minute: '2-digit'
+                                                            })}
+                                                        </p>
+                                                        {/* Show sending indicator for optimistic messages */}
+                                                        {message.sender === auth.user.id && message.id > 1000000000000 && isSending && (
+                                                            <Loader2 className="w-3 h-3 animate-spin opacity-60 ml-1" />
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
