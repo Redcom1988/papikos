@@ -7,12 +7,13 @@ import AppBar from '@/components/ui/appbar';
 import HeroSection from '@/components/ui/hero-section';
 import FilterSidebar from '@/components/ui/filter-sidebar';
 import RoomGrid from '@/components/ui/room-grid';
+import MobileChat from '@/components/ui/mobile-chat';
 
 export default function LandingPage() {
     const { auth, rooms, heroRoom, facilities, filters: initialFilters, userBookmarks = [] } = usePage<LandingPageProps>().props;
 
     // Use the bookmark hook
-    const { bookmarkedRooms, bookmarkLoading, handleBookmark, isBookmarked } = useBookmarks(userBookmarks);
+    const { bookmarkLoading, handleBookmark, isBookmarked } = useBookmarks(userBookmarks);
 
     // Use the filters hook
     const { filters, setFilters, loading, clearFilters } = useFilters({
@@ -105,6 +106,9 @@ export default function LandingPage() {
                         </div>
                     </div>
                 </section>
+
+                {/* Mobile Chat Component */}
+                <MobileChat />
             </div>
         </>
     );

@@ -66,4 +66,38 @@ class MessageController extends Controller
 
         return response()->json($messages);
     }
+
+    public function getChatUsers()
+    {
+        $authId = Auth::id();
+        
+        $userIds = Message::where('sender', $authId)
+            ->orWhere('receiver', $authId)
+            ->get(['sender', 'receiver'])
+            ->flatMap(function ($message) use ($authId) {
+                return [$message->sender, $message->receiver];
+            })
+            ->unique()
+            ->filter(function ($id) use ($authId) {
+                return $id !== $authId;
+            });
+
+        $users = User::whereIn('id', $userIds)
+            ->select('id', 'name', 'email')
+            ->get();
+
+        return response()->json($users);
+    }
+
+    public function getAllUsers()
+    {
+        $authId = Auth::id();
+        
+        $users = User::where('id', '!=', $authId)
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json($users);
+    }
 }
