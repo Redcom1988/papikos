@@ -50,6 +50,8 @@ class HandleInertiaRequests extends Middleware
                     'email' => $request->user()->email,
                     'phone' => $request->user()->phone,
                     'is_owner' => $request->user()->isOwner(),
+                    'role' => $request->user()->role, 
+                    'email_verified_at' => $request->user()->email_verified_at,
                 ] : null,
             ],
             'ziggy' => fn (): array => [

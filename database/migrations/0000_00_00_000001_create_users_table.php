@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phone')->nullable();
-            $table->boolean('is_owner')->default(false);
+            $table->enum('role', ['admin', 'owner', 'renter'])->default('renter');
             $table->rememberToken();
             $table->timestamps();
         });

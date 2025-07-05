@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -16,7 +16,7 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
-        'is_owner',
+        'role',
     ];
 
     protected $hidden = [
@@ -24,24 +24,42 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+        protected $visible = [
+        'id',
+        'name', 
+        'email',
+        'role', 
+        'email_verified_at',
+        'created_at',
+        'updated_at'
+    ];
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_owner' => 'boolean',
         ];
     }
 
-    // Relationships
-    public function ownedRooms()
+    public function isAdmin(): bool
     {
-        return $this->hasMany(Room::class, 'owner_id');
+        return $this->role === UserRole::ADMIN->value;
     }
 
-    public function bookmarks()
+    public function isOwner(): bool
     {
-        return $this->hasMany(Bookmark::class);
+        return $this->role === UserRole::OWNER->value;
+    }
+
+    public function isRenter(): bool
+    {
+        return $this->role === UserRole::RENTER->value;
+    }
+
+    public function rooms()
+    {
+        return $this->hasMany(Room::class, 'owner_id');
     }
 
     public function appointments()
@@ -49,29 +67,13 @@ class User extends Authenticatable
         return $this->hasMany(Appointment::class);
     }
 
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
     public function reports()
     {
         return $this->hasMany(Report::class);
-    }
-
-    // Helper methods
-    public function isOwner(): bool
-    {
-        return $this->is_owner;
-    }
-
-    public function isRenter(): bool
-    {
-        return !$this->is_owner;
-    }
-
-    public function hasVerifiedEmail(): bool
-    {
-        return !is_null($this->email_verified_at);
-    }
-
-    public function messages(): HasMany
-    {
-        return $this->hasMany(Message::class);
     }
 }
