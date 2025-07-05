@@ -13,11 +13,19 @@ use Inertia\Response;
 class PasswordController extends Controller
 {
     /**
-     * Show the user's password settings page.
+     * Show the user's password settings page (standalone).
      */
     public function edit(): Response
     {
         return Inertia::render('settings/password');
+    }
+
+    /**
+     * Show the user's password settings page (dashboard).
+     */
+    public function editDashboard(): Response
+    {
+        return Inertia::render('dashboard/settings/password');
     }
 
     /**

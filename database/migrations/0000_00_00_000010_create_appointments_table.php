@@ -1,5 +1,5 @@
 <?php
-// File: database/migrations/0000_00_00_000009_create_appointments_table.php
+// File: database/migrations/0000_00_00_0000010_create_appointments_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('room_id')->constrained()->onDelete('cascade');
             $table->timestamp('scheduled_at');
-            $table->enum('status', ['scheduled', 'completed', 'cancelled', 'no_show'])->default('scheduled');
+            $table->enum('status', ['scheduled', 'completed', 'cancelled'])->default('scheduled');
             $table->text('notes')->nullable();
             $table->timestamps();
             
