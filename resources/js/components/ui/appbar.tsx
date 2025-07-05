@@ -25,7 +25,6 @@ export default function AppBar({ auth, className = '', sticky = false }: AppBarP
 
     // Check if user has dashboard access (admin or owner)
     const hasDashboardAccess = auth.user && (auth.user.role === 'admin' || auth.user.role === 'owner');
-    console.log(auth.user)
 
     return (
         <header className={`bg-background border-b border-border ${sticky ? 'sticky top-0 z-40 backdrop-blur-sm' : ''} ${className}`}>
