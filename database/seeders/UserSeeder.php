@@ -10,13 +10,23 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create test owner
-        $owner = User::create([
-            'name' => 'Admin Owner',
+        // Create admin user
+        User::create([
+            'name' => 'System Admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'),
+            'phone' => '081234567890',
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]);
+
+        // Create test owner
+        User::create([
+            'name' => 'Property Owner',
+            'email' => 'owner@example.com',
+            'password' => Hash::make('password'),
             'phone' => '081234567891',
-            'is_owner' => true,
+            'role' => 'owner',
             'email_verified_at' => now(),
         ]);
 
@@ -26,12 +36,12 @@ class UserSeeder extends Seeder
             'email' => 'renter@example.com',
             'password' => Hash::make('password'),
             'phone' => '081234567892',
-            'is_owner' => false,
+            'role' => 'renter',
             'email_verified_at' => now(),
         ]);
 
         // Create more random users
-        User::factory(10)->create(['is_owner' => false]);
-        User::factory(10)->create(['is_owner' => true]);
+        User::factory(10)->create(['role' => 'renter']);
+        User::factory(5)->create(['role' => 'owner']);
     }
 }

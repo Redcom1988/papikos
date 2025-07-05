@@ -12,7 +12,7 @@ class RoomSeeder extends Seeder
 {
     public function run(): void
     {
-        $owners = User::where('is_owner', true)->get();
+        $owners = User::where('role', 'owner')->get();
 
         // If no owners exist, create a sample owner
         if ($owners->isEmpty()) {
@@ -20,7 +20,7 @@ class RoomSeeder extends Seeder
                 'name' => 'Sample Owner',
                 'email' => 'owner@example.com',
                 'password' => bcrypt('password'),
-                'is_owner' => true,
+                'role' => 'owner',
             ]);
             $owners = collect([$owner]);
         }
