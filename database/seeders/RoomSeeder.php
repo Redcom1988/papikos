@@ -77,6 +77,7 @@ class RoomSeeder extends Seeder
                 
                 $usedNames[] = $roomName;
 
+                // Some rooms with tours, some without:
                 $room = Room::create([
                     'owner_id' => $owner->id,
                     'name' => $roomName,
@@ -87,6 +88,11 @@ class RoomSeeder extends Seeder
                     'size' => rand(15, 50), // 15-50 sqm
                     'max_occupancy' => rand(1, 4),
                     'is_available' => rand(0, 10) > 1, // 90% available
+
+                    'available_tour_times' => rand(1, 10) <= 8 
+                        ? ['09:00', '14:00', '16:00', '18:00'] 
+                        : null, // null = tours disabled
+                    'max_advance_days' => rand(2, 5),
                 ]);
 
                 // Add facilities using the new many-to-many relationship

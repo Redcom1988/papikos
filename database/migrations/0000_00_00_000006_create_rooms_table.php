@@ -20,6 +20,10 @@ return new class extends Migration
             $table->integer('size')->nullable(); // in sqm
             $table->integer('max_occupancy')->default(1);
             $table->boolean('is_available')->default(true);
+
+            $table->json('available_tour_times')->nullable(); // null = tours disabled
+            $table->integer('max_advance_days')->default(2);
+
             $table->timestamps();
             
             $table->index(['is_available', 'price']);

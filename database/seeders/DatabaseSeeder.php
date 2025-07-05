@@ -14,8 +14,8 @@ class DatabaseSeeder extends Seeder
             RoomSeeder::class,
             BookmarkSeeder::class,
             AppointmentSeeder::class,
-            PaymentSeeder::class,
-            ReviewSeeder::class,
+            ReportSeeder::class,
+            MessageSeeder::class,
         ]);
     }
 }
