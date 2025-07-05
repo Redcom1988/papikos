@@ -10,7 +10,7 @@ import RoomGrid from '@/components/ui/room-grid';
 import MobileChat from '@/components/ui/mobile-chat';
 
 export default function LandingPage() {
-    const { auth, rooms, heroRoom, facilities, filters: initialFilters, userBookmarks = [] } = usePage<LandingPageProps>().props;
+    const { auth, rooms, heroRoom, totalProperties, totalOwners, facilities, filters: initialFilters, userBookmarks = [] } = usePage<LandingPageProps>().props;
 
     // Use the bookmark hook
     const { bookmarkLoading, handleBookmark, isBookmarked } = useBookmarks(userBookmarks);
@@ -47,7 +47,7 @@ export default function LandingPage() {
 
     return (
         <>
-            <Head title="Papikos - Find Your Perfect Room">
+            <Head title="Papikos - Find Your Perfect Temporary Housing">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
@@ -55,7 +55,11 @@ export default function LandingPage() {
             <div className="min-h-screen bg-background text-foreground">
                 <AppBar auth={auth} />
                 
-                <HeroSection room={heroRoom} />
+                <HeroSection 
+                    room={heroRoom} 
+                    totalProperties={Number(totalProperties)}
+                    totalOwners={Number(totalOwners)}
+                />
 
                 <section className="bg-muted/50 py-16">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,9 +69,6 @@ export default function LandingPage() {
                                     Find The Right One For You:<br />
                                     Explore Our Current Listings!
                                 </h2>
-                                <p className="text-muted-foreground">
-                                    {rooms.length}+ Kos Di Jambaran, Bolong
-                                </p>
                             </div>
                             <div className="flex items-center space-x-4">
                                 <Link

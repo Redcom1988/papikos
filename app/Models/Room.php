@@ -59,9 +59,14 @@ class Room extends Model
         return $this->hasOne(RoomImage::class)->where('is_primary', true);
     }
 
-    public function bookmarks(): HasMany
+    public function bookmarks()
     {
         return $this->hasMany(Bookmark::class);
+    }
+
+    public function bookmarkedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'bookmarks');
     }
 
     public function appointments(): HasMany

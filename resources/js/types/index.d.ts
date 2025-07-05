@@ -51,7 +51,7 @@ export interface Room {
     location: string;
     reviewCount: number;
     images: string[];
-    facilities: string[];
+    facilities: Facility[];
     description: string;
     availableTours: string[];
     primary_image: string | null;
@@ -193,4 +193,20 @@ export interface RoomListingsPageProps extends SharedData {
 export interface RoomDetailsPageProps extends SharedData {
     room: RoomDetails;
     userBookmarks?: number[];
+}
+
+export interface BookmarkedRoomsPageProps extends SharedData {
+    auth: {
+        user: User;
+    };
+    rooms: PaginatedRooms;
+    facilities: Facility[];
+    filters: {
+        search: string;
+        min_price: number;
+        max_price: number;
+        facilities: string[];
+        sort_by: string;
+    };
+    userBookmarks: number[];
 }

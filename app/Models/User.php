@@ -72,6 +72,11 @@ class User extends Authenticatable
         return $this->hasMany(Bookmark::class);
     }
 
+    public function bookmarkedRooms()
+    {
+        return $this->belongsToMany(Room::class, 'bookmarks');
+    }
+
     public function reports()
     {
         return $this->hasMany(Report::class);

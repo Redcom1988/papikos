@@ -3,6 +3,7 @@ import { Link } from '@inertiajs/react';
 import { Star } from 'lucide-react';
 import BookmarkButton from './bookmark-button';
 import RoomImage from './room-image';
+import Tag from './tag';
 
 interface RoomCardProps {
     room: Room;
@@ -19,6 +20,10 @@ export default function RoomCard({
     onBookmark,
     className = ""
 }: RoomCardProps) {
+    // Show only first 3 facilities as tags
+    const displayFacilities = room.facilities?.slice(0, 3) || [];
+    const remainingCount = (room.facilities?.length || 0) - displayFacilities.length;
+
     return (
         <div className={`bg-card border border-border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow ${className}`}>
             {/* Room Image */}
@@ -58,6 +63,31 @@ export default function RoomCard({
                 <p className="text-sm text-muted-foreground mb-3">
                     {room.size}m² • {room.max_occupancy} person
                 </p>
+
+                {/* Facility Tags */}
+                {displayFacilities.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                        {displayFacilities.map((facility, index) => (
+                            <Tag
+                                key={facility.id}
+                                variant="outline"
+                                size="sm"
+                                className="text-xs"
+                            >
+                                {facility.name}
+                            </Tag>
+                        ))}
+                        {remainingCount > 0 && (
+                            <Tag
+                                variant="default"
+                                size="sm"
+                                className="text-xs"
+                            >
+                                +{remainingCount}
+                            </Tag>
+                        )}
+                    </div>
+                )}
 
                 {/* Price */}
                 <div className="flex items-center justify-between">
