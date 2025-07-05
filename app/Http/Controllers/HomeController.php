@@ -17,15 +17,18 @@ class HomeController extends Controller
         // Get filter parameters
         $filters = [
             'min_price' => $request->input('min_price', 0),
-            'max_price' => $request->input('max_price', 10000000),
+            'max_price' => $request->input('max_price', 999999999),
             'facilities' => $request->input('facilities', []),
         ];
 
         // Get available rooms with filters
-        $rooms = Room::getAvailableRooms($filters);
+        $rooms = Room::getAllRooms($filters);
         
+        // Get random room for hero (separate from filtered results)
+        $heroRoom = Room::getRandomRoomForHero();
+
         // Get all available facilities with IDs for the filter dropdown
-        $availableFacilities = Facility::select('id', 'name')->get()->toArray();
+        $facilities = Room::getAllFacilities();
 
         // Get user's bookmarks if authenticated
         $userBookmarks = [];
@@ -37,7 +40,8 @@ class HomeController extends Controller
 
         return Inertia::render('landing-page', [
             'rooms' => $rooms,
-            'facilities' => $availableFacilities,
+            'heroRoom' => $heroRoom,
+            'facilities' => $facilities,
             'filters' => $filters,
             'userBookmarks' => $userBookmarks,
         ]);
