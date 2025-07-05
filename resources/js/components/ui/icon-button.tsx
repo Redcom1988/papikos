@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'default' | 'bookmarked' | 'danger';
+    variant?: 'default' | 'danger';
     size?: 'sm' | 'md' | 'lg';
     children: React.ReactNode;
 }
@@ -22,7 +22,6 @@ export default function IconButton({
 
     const variantClasses = {
         default: 'bg-background/80 border border-border text-foreground hover:bg-muted hover:text-muted-foreground dark:bg-background/80 dark:border-border dark:text-foreground dark:hover:bg-muted dark:hover:text-muted-foreground',
-        bookmarked: 'bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 dark:bg-primary/10 dark:border-primary/20 dark:text-primary dark:hover:bg-primary/20',
         danger: 'bg-destructive/10 border border-destructive/20 text-destructive hover:bg-destructive/20 dark:bg-destructive/10 dark:border-destructive/20 dark:text-destructive dark:hover:bg-destructive/20'
     };
 
