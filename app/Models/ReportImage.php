@@ -16,4 +16,16 @@ class ReportImage extends Model
     {
         return $this->belongsTo(Report::class);
     }
+
+    // Helper to get full URL if needed
+    public function getFullUrlAttribute(): string
+    {
+        // If URL is already full URL, return as is
+        if (str_starts_with($this->url, 'http')) {
+            return $this->url;
+        }
+        
+        // Otherwise, prepend app URL
+        return url($this->url);
+    }
 }
