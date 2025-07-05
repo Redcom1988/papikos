@@ -15,6 +15,13 @@ class Report extends Model
         'description',
         'status',
         'admin_notes',
+        'owner_response', 
+        'owner_response_action', 
+        'owner_responded_at',
+    ];
+
+    protected $casts = [
+        'owner_responded_at' => 'datetime',
     ];
 
     public function reporter(): BelongsTo
@@ -35,5 +42,21 @@ class Report extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ReportImage::class);
+    }
+
+    // Helper methods
+    public function hasOwnerResponse(): bool
+    {
+        return !empty($this->owner_response);
+    }
+
+    public function isResolved(): bool
+    {
+        return $this->status === 'resolved';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
     }
 }

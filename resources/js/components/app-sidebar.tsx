@@ -19,15 +19,11 @@ import {
     LayoutGrid, 
     Home, 
     Calendar,
-    Heart,
-    CreditCard,
-    Star,
     Settings,
     PlusCircle,
     Users,
-    TrendingUp,
-    Wallet,
-    User
+    User,
+    Flag,
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -35,7 +31,7 @@ interface User {
     id: number;
     name: string;
     email: string;
-    is_owner: boolean;
+    role: 'admin' | 'owner' | 'renter';
 }
 
 interface PageProps {
@@ -63,6 +59,30 @@ export function AppSidebar() {
         },
     ];
 
+    // Admin-specific sections
+    const adminSections: NavSection[] = [
+        {
+            title: 'Administration',
+            items: [
+                {
+                    title: 'Manage Users',
+                    href: '/admin/users',
+                    icon: Users,
+                },
+                {
+                    title: 'Manage Rooms',
+                    href: '/admin/rooms',
+                    icon: Home,
+                },
+                {
+                    title: 'Reports',
+                    href: '/admin/reports',
+                    icon: Flag,
+                },
+            ]
+        }
+    ];
+
     // Owner-specific sections
     const ownerSections: NavSection[] = [
         {
@@ -81,92 +101,36 @@ export function AppSidebar() {
             ]
         },
         {
-            title: 'Business',
-            items: [
-                {
-                    title: 'Bookings',
-                    href: '/owner/bookings',
-                    icon: Calendar,
-                },
-                {
-                    title: 'Tenants',
-                    href: '/owner/tenants',
-                    icon: Users,
-                },
-                {
-                    title: 'Earnings',
-                    href: '/owner/earnings',
-                    icon: TrendingUp,
-                },
-                {
-                    title: 'Payouts',
-                    href: '/owner/payouts',
-                    icon: Wallet,
-                },
-            ]
-        },
-        {
-            title: 'Reviews & Feedback',
-            items: [
-                {
-                    title: 'Reviews',
-                    href: '/owner/reviews',
-                    icon: Star,
-                },
-            ]
-        }
-    ];
-
-    // Renter-specific sections
-    const renterSections: NavSection[] = [
-        {
-            title: 'Find Rooms',
-            items: [
-                {
-                    title: 'Browse Rooms',
-                    href: '/rooms',
-                    icon: Home,
-                },
-                {
-                    title: 'My Bookmarks',
-                    href: '/bookmarks',
-                    icon: Heart,
-                },
-            ]
-        },
-        {
-            title: 'My Activity',
+            title: 'Activity',
             items: [
                 {
                     title: 'Appointments',
-                    href: '/appointments',
+                    href: '/owner/appointments',
                     icon: Calendar,
                 },
                 {
-                    title: 'My Bookings',
-                    href: '/bookings',
-                    icon: User,
-                },
-                {
-                    title: 'Payment History',
-                    href: '/payments',
-                    icon: CreditCard,
-                },
-                {
-                    title: 'My Reviews',
-                    href: '/reviews',
-                    icon: Star,
+                    title: 'Reports',
+                    href: '/owner/reports',
+                    icon: Flag,
                 },
             ]
         }
     ];
 
-    const sections = user.is_owner ? ownerSections : renterSections;
+
+    // Determine which sections to show based on user role
+    let sections: NavSection[] = [];
+    if (user.role === 'admin') {
+        sections = adminSections;
+    } else if (user.role === 'owner') {
+        sections = ownerSections;
+    } 
+    console.log(user.role)
 
     const footerNavItems: NavItem[] = [
         {
             title: 'Settings',
-            href: '/settings',
+            href: '/dashboard/settings/profile',
             icon: Settings,
         },
     ];
@@ -177,7 +141,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href="/" prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

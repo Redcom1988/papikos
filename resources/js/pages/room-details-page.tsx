@@ -40,20 +40,12 @@ export default function RoomDetailsPage() {
     const [reportType, setReportType] = useState('');
     const [reportDescription, setReportDescription] = useState('');
     const [reviewMessage, setReviewMessage] = useState('');
+    const [reportImages, setReportImages] = useState<File[]>([]);
 
     const formatPrice = (price: number) => {
         return new Intl.NumberFormat('id-ID', {
             minimumFractionDigits: 0
         }).format(price);
-    };
-
-    const handleReviewSubmit = async () => {
-        if (!auth.user) {
-            router.visit(route('login'));
-            return;
-        } else {
-            alert('Review submitted successfully!'); // TODO: Implement actual review submission
-        }
     };
 
     const handleScheduleSurvey = async () => {
@@ -99,14 +91,6 @@ export default function RoomDetailsPage() {
         }
     };
 
-    const handleRent = () => {
-        if (!auth.user) {
-            router.visit(route('login'));
-            return;
-        }
-        alert(`Rent request for ${room.title} - Payment integration coming soon!`);
-    };
-
     const handleSurveySchedule = () => {
         if (!auth.user) {
             router.visit(route('login'));
@@ -115,17 +99,66 @@ export default function RoomDetailsPage() {
         setShowScheduleDialog(true);
     }
 
-    const handleSubmitReport = () => {
+    const handleSubmitReport = async () => {
         if (!reportType) {
             alert('Please select a report type');
             return;
         }
         
-        // TODO: Implement actual report submission
-        alert('Report submitted successfully');
-        setShowReportDialog(false);
-        setReportType('');
-        setReportDescription('');
+        if (!reportDescription.trim()) {
+            alert('Please provide a description');
+            return;
+        }
+
+        // Show confirmation for serious reports
+        if (['fraud', 'safety_concern'].includes(reportType)) {
+            const confirmed = confirm(
+                'This is a serious report. Are you sure you want to proceed? ' +
+                'False reports may result in account restrictions.'
+            );
+            if (!confirmed) return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('room_id', room.id.toString());
+            formData.append('type', reportType);
+            formData.append('description', reportDescription);
+
+            // Append files to formData
+            reportImages.forEach((file, index) => {
+                formData.append(`images[${index}]`, file);
+            });
+
+            const response = await fetch(route('reports.store'), {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                },
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                alert('Report submitted successfully. Thank you for helping keep our community safe.');
+                setShowReportDialog(false);
+                setReportType('');
+                setReportDescription('');
+                setReportImages([]);
+            } else {
+                // Handle validation errors
+                if (result.errors) {
+                    const errorMessages = Object.values(result.errors).flat().join('\n');
+                    alert('Validation errors:\n' + errorMessages);
+                } else {
+                    alert(result.message || 'Error submitting report');
+                }
+            }
+        } catch (error) {
+            console.error('Error submitting report:', error);
+            alert('Error submitting report');
+        }
     };
 
     // Also add scroll restoration when dialog close
@@ -202,15 +235,6 @@ export default function RoomDetailsPage() {
 
                                     {/* Action Buttons */}
                                     <div className="flex space-x-2">
-                                        <Button
-                                            variant="outline" 
-                                            onClick={handleRent}
-                                            size="lg"
-                                            className="border-border text-foreground hover:bg-muted"
-                                        >
-                                            Apply for Rent
-                                            <ArrowRight className="w-3 h-3 ml-1" />
-                                        </Button>
                                         <Button 
                                             variant="outline" 
                                             onClick={handleSurveySchedule}
@@ -358,14 +382,20 @@ export default function RoomDetailsPage() {
                             <div>
                                 <h4 className="font-medium text-foreground mb-3">Select a Report Type</h4>
                                 <div className="grid grid-cols-2 gap-3">
-                                    {['Inappropriate Content', 'Fake Listing', 'Spam', 'Other'].map((type) => (
+                                    {[
+                                        { value: 'inappropriate_content', label: 'Inappropriate Content' },
+                                        { value: 'fake_listing', label: 'Fake Listing' },
+                                        { value: 'fraud', label: 'Fraud/Scam' },
+                                        { value: 'safety_concern', label: 'Safety Concern' },
+                                        { value: 'other', label: 'Other' }
+                                    ].map((type) => (
                                         <Button
-                                            key={type}
-                                            variant={reportType === type ? "default" : "outline"}
-                                            onClick={() => setReportType(type)}
+                                            key={type.value}
+                                            variant={reportType === type.value ? "default" : "outline"}
+                                            onClick={() => setReportType(type.value)}
                                             className="text-center w-full min-h-[44px] px-3 py-2 text-sm leading-tight break-words"
                                         >
-                                            {type}
+                                            {type.label}
                                         </Button>
                                     ))}
                                 </div>
@@ -380,6 +410,25 @@ export default function RoomDetailsPage() {
                                     className="w-full p-3 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
                                     rows={4}
                                 />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-foreground mb-2">
+                                    Evidence (Optional)
+                                </label>
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files || []);
+                                        setReportImages(files.slice(0, 3)); // Max 3 images
+                                    }}
+                                    className="w-full p-2 border border-border rounded-lg"
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Upload up to 3 images as evidence (optional)
+                                </p>
                             </div>
 
                             <Button

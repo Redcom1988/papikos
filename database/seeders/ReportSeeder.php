@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Room;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
+use Carbon\Carbon;
 
 class ReportSeeder extends Seeder
 {
@@ -25,6 +26,7 @@ class ReportSeeder extends Seeder
 
         $reportTypes = ['inappropriate_content', 'fake_listing', 'fraud', 'safety_concern', 'other'];
         $statuses = ['pending', 'investigating', 'resolved', 'dismissed'];
+        $ownerResponseActions = ['issue_resolved', 'listing_updated', 'additional_info', 'dispute'];
         
         $reportDescriptions = [
             'inappropriate_content' => [
@@ -54,22 +56,62 @@ class ReportSeeder extends Seeder
             ]
         ];
 
+        $ownerResponses = [
+            'issue_resolved' => [
+                'I have fixed the issues mentioned in this report. The problem has been resolved.',
+                'Thank you for bringing this to my attention. I have addressed all the concerns raised.',
+                'The reported issues have been corrected. The listing is now accurate.',
+                'I apologize for any inconvenience. The matter has been resolved completely.',
+            ],
+            'listing_updated' => [
+                'I have updated the listing with more accurate information and photos.',
+                'The listing description and images have been revised based on your feedback.',
+                'Thank you for the feedback. I have made necessary updates to the listing.',
+                'The listing has been updated to reflect the current condition of the room.',
+            ],
+            'additional_info' => [
+                'I would like to provide additional context about this situation.',
+                'There seems to be a misunderstanding. Let me clarify the situation.',
+                'I have more information that might help resolve this matter.',
+                'Please let me explain the circumstances behind this report.',
+            ],
+            'dispute' => [
+                'I disagree with this report. The claims made are not accurate.',
+                'This report contains false information about my property.',
+                'I believe this report is unfair and does not reflect reality.',
+                'I contest the validity of the claims made in this report.',
+            ]
+        ];
+
         // Create 30 reports
         for ($i = 0; $i < 30; $i++) {
             $reporter = $users->random();
             $room = $rooms->random();
             $type = $faker->randomElement($reportTypes);
             $status = $faker->randomElement($statuses);
+            $createdAt = $faker->dateTimeBetween('-60 days', 'now');
             
-            $report = Report::create([
+            $reportData = [
                 'reporter_id' => $reporter->id,
                 'room_id' => $room->id,
                 'type' => $type,
                 'description' => $faker->randomElement($reportDescriptions[$type]),
                 'status' => $status,
                 'admin_notes' => $status !== 'pending' ? $faker->sentence(10) : null,
-                'created_at' => $faker->dateTimeBetween('-60 days', 'now'),
-            ]);
+                'created_at' => $createdAt,
+            ];
+
+            // Add owner response for 40% of non-pending reports
+            if ($status !== 'pending' && rand(1, 10) <= 4) {
+                $responseAction = $faker->randomElement($ownerResponseActions);
+                $responseDate = Carbon::parse($createdAt)->addDays(rand(1, 7));
+                
+                $reportData['owner_response'] = $faker->randomElement($ownerResponses[$responseAction]);
+                $reportData['owner_response_action'] = $responseAction;
+                $reportData['owner_responded_at'] = $responseDate;
+            }
+
+            $report = Report::create($reportData);
 
             // Add some images to reports (30% chance)
             if (rand(1, 10) <= 3) {
@@ -83,43 +125,70 @@ class ReportSeeder extends Seeder
             }
         }
 
-        // Create some specific scenario reports
+        // Create some specific scenario reports with owner responses
         $specificReports = [
             [
                 'type' => 'fake_listing',
                 'description' => 'This listing is using photos from a 5-star hotel. I reverse searched the images and found them on the hotel\'s official website.',
                 'status' => 'investigating',
                 'admin_notes' => 'Images flagged for verification. Contacted owner for proof of ownership.',
+                'owner_response' => 'I understand the concern, but these are actually professional photos I had taken of my property. I can provide the photographer\'s contact information and invoices as proof.',
+                'owner_response_action' => 'additional_info',
             ],
             [
                 'type' => 'fraud',
                 'description' => 'Owner demanded 6 months rent upfront via bank transfer before even showing the room. Very suspicious behavior.',
                 'status' => 'resolved',
                 'admin_notes' => 'Owner account suspended. User refunded through platform protection.',
+                'owner_response' => 'I apologize for any confusion. I was following what I thought was standard practice, but I understand now that this was inappropriate. I have updated my approach.',
+                'owner_response_action' => 'issue_resolved',
             ],
             [
                 'type' => 'safety_concern',
                 'description' => 'Electrical wiring is exposed and dangerous. Fire exits are blocked. This place is a safety hazard.',
                 'status' => 'resolved',
                 'admin_notes' => 'Listing removed. Local authorities contacted for safety inspection.',
+                'owner_response' => 'Thank you for bringing this to my attention. I have hired a licensed electrician to fix all wiring issues and have cleared all fire exits. Safety inspection has been completed.',
+                'owner_response_action' => 'issue_resolved',
+            ],
+            [
+                'type' => 'inappropriate_content',
+                'description' => 'Room description contains offensive language that makes me uncomfortable as a potential renter.',
+                'status' => 'resolved',
+                'admin_notes' => 'Owner was contacted and listing description was updated.',
+                'owner_response' => 'I sincerely apologize for the inappropriate language. I have completely rewritten the listing description to be more professional and welcoming.',
+                'owner_response_action' => 'listing_updated',
+            ],
+            [
+                'type' => 'other',
+                'description' => 'The room condition does not match the photos at all. Very misleading listing.',
+                'status' => 'dismissed',
+                'admin_notes' => 'Investigation showed photos were taken before tenant moved in. No violation found.',
+                'owner_response' => 'I believe this report is unfair. The photos were taken when the room was clean and vacant. The current condition reflects normal wear from the previous tenant.',
+                'owner_response_action' => 'dispute',
             ],
         ];
 
-        foreach ($specificReports as $reportData) {
+        foreach ($specificReports as $index => $reportData) {
             $reporter = $users->where('is_owner', false)->random();
             $room = $rooms->random();
+            $createdAt = $faker->dateTimeBetween('-30 days', 'now');
+            $responseDate = Carbon::parse($createdAt)->addDays(rand(2, 10));
             
             Report::create([
                 'reporter_id' => $reporter->id,
-                'room_id' => $room->id, 
+                'room_id' => $room->id,
                 'type' => $reportData['type'],
                 'description' => $reportData['description'],
                 'status' => $reportData['status'],
                 'admin_notes' => $reportData['admin_notes'],
-                'created_at' => $faker->dateTimeBetween('-30 days', 'now'),
+                'owner_response' => $reportData['owner_response'],
+                'owner_response_action' => $reportData['owner_response_action'],
+                'owner_responded_at' => $responseDate,
+                'created_at' => $createdAt,
             ]);
         }
 
-        $this->command->info('Reports seeded successfully!');
+        $this->command->info('Reports seeded successfully with owner responses!');
     }
 }
