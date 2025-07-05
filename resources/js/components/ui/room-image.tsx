@@ -37,14 +37,22 @@ export default function RoomImage({
         lg: "w-8 h-8"
     };
 
+    // Get the proper object-fit style
+    const getObjectFitStyle = () => {
+        return {
+            objectFit: objectFit,
+            objectPosition: 'center center'
+        };
+    };
+
     return (
         <div 
-            className={`relative ${onClick ? 'cursor-pointer' : ''} ${className}`}
+            className={`relative overflow-hidden bg-muted ${onClick ? 'cursor-pointer' : ''} ${className}`}
             onClick={onClick}
         >
             {/* Loading skeleton */}
             {isLoading && (
-                <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+                <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center z-10">
                     <div className={`${loadingSizes[loadingSize]} border-2 border-primary border-t-transparent rounded-full animate-spin`}></div>
                 </div>
             )}
@@ -65,7 +73,8 @@ export default function RoomImage({
                     alt={alt}
                     onLoad={handleLoad}
                     onError={handleError}
-                    className={`w-full h-full object-${objectFit} transition-all duration-300 ${
+                    style={getObjectFitStyle()}
+                    className={`w-full h-full transition-all duration-300 ${
                         isLoading ? 'opacity-0' : 'opacity-100'
                     }`}
                 />
