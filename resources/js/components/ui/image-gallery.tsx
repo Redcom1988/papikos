@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import RoomImage from './room-image';
+import ImageModal from './image-modal';
 
 interface ImageGalleryImage {
     id: number;
@@ -15,6 +16,7 @@ interface ImageGalleryProps {
 
 export default function ImageGallery({ images, className = "" }: ImageGalleryProps) {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [showModal, setShowModal] = useState(false);
 
     if (!images || images.length === 0) {
         return (
@@ -24,49 +26,75 @@ export default function ImageGallery({ images, className = "" }: ImageGalleryPro
         );
     }
 
+    const currentImage = images[selectedImageIndex] || images[0];
+
+    const nextImage = () => {
+        setSelectedImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0);
+    };
+
+    const prevImage = () => {
+        setSelectedImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1);
+    };
+
     return (
-        <div className={`flex gap-2 h-full ${className}`}>
-            {/* Main Large Image */}
-            <div className="flex-1 overflow-hidden rounded-lg">
-                <RoomImage 
-                    src={images[selectedImageIndex]?.url || images[0]?.url}
-                    alt={images[selectedImageIndex]?.caption || 'Room image'}
-                    className="h-full"
-                    objectFit="cover"
-                />
-            </div>
-            
-            {/* Scrollable Thumbnail Column */}
-            <div className="w-20 flex flex-col gap-1">
-                <div className="flex-1 overflow-y-auto min-h-0 space-y-1">
-                    {images.map((image, index) => (
-                        <div 
-                            key={image.id} 
-                            className={`aspect-square rounded-md overflow-hidden transition-all duration-200 bg-muted ${
-                                selectedImageIndex === index 
-                                    ? 'ring-2 ring-blue-500 opacity-100' 
-                                    : 'opacity-70 hover:opacity-100'
-                            }`}
-                        >
-                            <RoomImage 
-                                src={image.url}
-                                alt={image.caption}
-                                className="h-full"
-                                objectFit="contain"
-                                onClick={() => setSelectedImageIndex(index)}
-                                loadingSize="sm"
-                            />
-                        </div>
-                    ))}
+        <>
+            <div className={`flex gap-2 h-full ${className}`}>
+                {/* Main Large Image */}
+                <div 
+                    className="flex-1 overflow-hidden rounded-lg cursor-zoom-in hover:opacity-90 transition-opacity duration-200"
+                    onClick={() => setShowModal(true)}
+                >
+                    <RoomImage
+                        src={currentImage.url}
+                        alt={currentImage.caption}
+                        className="h-full"
+                        objectFit="cover"
+                        loadingSize="lg"
+                    />
                 </div>
                 
-                {/* Show more indicator */}
-                {images.length > 6 && (
-                    <div className="text-xs text-gray-400 text-center py-1 bg-gray-50 rounded-md">
-                        +{images.length - 6}
+                {/* Scrollable Thumbnail Column */}
+                <div className="w-20 flex flex-col gap-1">
+                    <div className="flex-1 overflow-y-auto min-h-0 space-y-1">
+                        {images.map((image, index) => (
+                            <div 
+                                key={image.id} 
+                                className={`aspect-square rounded-md overflow-hidden transition-all duration-200 cursor-pointer ${
+                                    selectedImageIndex === index 
+                                        ? 'ring-2 ring-primary opacity-100' 
+                                        : 'opacity-70 hover:opacity-100'
+                                }`}
+                            >
+                                <RoomImage
+                                    src={image.url}
+                                    alt={image.caption}
+                                    className="h-full"
+                                    objectFit="cover"
+                                    onClick={() => setSelectedImageIndex(index)}
+                                    loadingSize="sm"
+                                />
+                            </div>
+                        ))}
                     </div>
-                )}
+                    
+                    {/* Show more indicator */}
+                    {images.length > 6 && (
+                        <div className="text-xs text-muted-foreground text-center py-1 bg-muted rounded-md">
+                            +{images.length - 6}
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+
+            {/* Image Modal */}
+            <ImageModal
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                images={images}
+                currentIndex={selectedImageIndex}
+                onPrevious={prevImage}
+                onNext={nextImage}
+            />
+        </>
     );
 }
