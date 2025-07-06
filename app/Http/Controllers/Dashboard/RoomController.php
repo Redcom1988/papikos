@@ -99,7 +99,10 @@ class RoomController extends Controller
         
         return Inertia::render('dashboard/room-form', [
             'facilities' => $facilities,
-            'room' => null
+            'room' => null,
+            'auth' => [
+                'user' => Auth::user()
+            ]
         ]);
     }
 
@@ -156,7 +159,12 @@ class RoomController extends Controller
                 }
             }
 
-            return redirect()->route('dashboard.rooms.owned')
+            // Determine redirect based on user role
+            $redirectRoute = Auth::user()->role === 'admin' 
+                ? 'dashboard.rooms.all' 
+                : 'dashboard.rooms.owned';
+
+            return redirect()->route($redirectRoute)
                 ->with('success', 'Room created successfully!');
 
         } catch (\Exception $e) {
@@ -168,7 +176,7 @@ class RoomController extends Controller
     public function edit(Room $room)
     {
         // Check if user owns this room or is admin
-        if ($room->owner_id !== Auth::id() && !Auth::user()->is_admin) {
+        if ($room->owner_id !== Auth::id() && !(Auth::user()->role === 'admin')) {
             abort(403);
         }
 
@@ -198,7 +206,10 @@ class RoomController extends Controller
 
         return Inertia::render('dashboard/room-form', [
             'facilities' => $facilities,
-            'room' => $roomData
+            'room' => $roomData,
+            'auth' => [
+                'user' => Auth::user()
+            ]
         ]);
     }
 
@@ -206,7 +217,7 @@ class RoomController extends Controller
     public function update(Request $request, Room $room)
     {
         // Check if user owns this room or is admin
-        if ($room->owner_id !== Auth::id() && !Auth::user()->is_admin) {
+        if ($room->owner_id !== Auth::id() && !(Auth::user()->role === 'admin')) {
             abort(403);
         }
 
@@ -272,7 +283,12 @@ class RoomController extends Controller
                 }
             }
 
-            return redirect()->route('dashboard.rooms.owned')
+            // Determine redirect based on user role
+            $redirectRoute = Auth::user()->role === 'admin' 
+                ? 'dashboard.rooms.all' 
+                : 'dashboard.rooms.owned';
+
+            return redirect()->route($redirectRoute)
                 ->with('success', 'Room updated successfully!');
 
         } catch (\Exception $e) {
@@ -284,7 +300,7 @@ class RoomController extends Controller
     public function destroy(Room $room)
     {
         // Check if user owns this room or is admin
-        if ($room->owner_id !== Auth::id() && !Auth::user()->is_admin) {
+        if ($room->owner_id !== Auth::id() && !(Auth::user()->role === 'admin')) {
             abort(403);
         }
 

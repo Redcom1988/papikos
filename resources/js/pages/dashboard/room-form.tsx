@@ -56,13 +56,36 @@ interface Room {
 interface RoomFormProps {
     facilities: Facility[];
     room?: Room | null;
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            role?: string;
+        };
+    };
 }
 
-const getRoomBreadcrumbs = (room?: Room | null): BreadcrumbItem[] => [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'My Rooms', href: '/dashboard/rooms' },
-    { title: room ? 'Edit Room' : 'Add Room', href: room ? `/dashboard/rooms/${room.id}/edit` : '/dashboard/rooms/create' },
-];
+const getRoomBreadcrumbs = (room?: Room | null, userRole?: string): BreadcrumbItem[] => {
+    const baseBreadcrumbs = [
+        { title: 'Dashboard', href: '/dashboard' }
+    ];
+
+    // Determine the rooms list page based on user role
+    if (userRole === 'admin') {
+        baseBreadcrumbs.push({ title: 'All Rooms', href: '/dashboard/rooms-all' });
+    } else {
+        baseBreadcrumbs.push({ title: 'My Rooms', href: '/dashboard/rooms-owned' });
+    }
+
+    // Add the current page
+    baseBreadcrumbs.push({
+        title: room ? 'Edit Room' : 'Add Room',
+        href: room ? `/dashboard/rooms/${room.id}/edit` : '/dashboard/rooms/create'
+    });
+
+    return baseBreadcrumbs;
+};
 
 interface FileWithPreview extends File {
     preview?: string;
@@ -72,8 +95,8 @@ const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
 const MAX_IMAGES = 10;
 
-export default function RoomForm({ facilities, room }: RoomFormProps) {
-    const breadcrumbs = getRoomBreadcrumbs(room);
+export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
+    const breadcrumbs = getRoomBreadcrumbs(room, auth.user.role);
     const [selectedFiles, setSelectedFiles] = useState<FileWithPreview[]>([]);
     const [deletedImages, setDeletedImages] = useState<number[]>([]);
 
@@ -178,37 +201,15 @@ export default function RoomForm({ facilities, room }: RoomFormProps) {
             
             formData.append('_method', 'PUT');
             
-            // Add this for debugging (remove after testing)
-            console.log('Form data being sent:');
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
-            }
-            
             router.post(`/dashboard/rooms/${room.id}`, formData, {
                 forceFormData: true,
-                onSuccess: (page) => {
-                    console.log('Update successful:', page);
-                },
                 onError: (errors) => {
                     console.log('Update errors:', errors);
                 }
             });
         } else {
-            // For new rooms - use 'images'
-            selectedFiles.forEach((file, index) => {
-                formData.append(`images[${index}]`, file);
-            });
-            
-            console.log('Form data being sent:');
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
-            }
-            
             router.post('/dashboard/rooms', formData, {
                 forceFormData: true,
-                onSuccess: (page) => {
-                    console.log('Create successful:', page);
-                },
                 onError: (errors) => {
                     console.log('Create errors:', errors);
                 }
@@ -611,9 +612,9 @@ export default function RoomForm({ facilities, room }: RoomFormProps) {
 
                     {/* Submit Button */}
                     <div className="flex justify-end gap-4">
-                        <Link href="/dashboard/rooms">
-                            <Button type="button" variant="outline">Cancel</Button>
-                        </Link>
+                        <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                            Cancel
+                        </Button>
                         <Button type="submit" disabled={processing}>
                             {processing ? 'Saving...' : room ? 'Update Room' : 'Create Room'}
                         </Button>
