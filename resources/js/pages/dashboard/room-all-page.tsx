@@ -1,4 +1,4 @@
-import { Head, router } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -225,13 +225,14 @@ export default function RoomAllPage({ rooms }: RoomAllPageProps) {
                                                     >
                                                         <Eye className="w-3 h-3" />
                                                     </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => router.visit(`/dashboard/rooms/${room.id}/edit`)}
-                                                    >
-                                                        <Edit className="w-3 h-3" />
-                                                    </Button>
+                                                    <Link href={`/dashboard/rooms/${room.id}/edit`}>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                        >
+                                                            <Edit className="w-3 h-3" />
+                                                        </Button>
+                                                    </Link>
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"

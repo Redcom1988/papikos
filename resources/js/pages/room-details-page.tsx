@@ -212,10 +212,9 @@ export default function RoomDetailsPage() {
                         <div className="mb-8">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex-1">
-                                    <h1 className="text-2xl font-semibold text-foreground mb-2">{room.title}</h1>
+                                    <h1 className="text-3xl font-semibold text-foreground mb-2">{room.title}</h1>
                                     <div className="flex items-center space-x-4">
-                                        <span className="text-xl font-bold text-foreground">{formatPrice(room.price)}/month</span>
-                                        <span className="text-sm text-muted-foreground">Tidak termasuk listrik</span>
+                                        <span className="text-xl font-semibold text-muted-foreground">{formatPrice(room.price)}/month</span>
                                     </div>
                                 </div>
                                 
@@ -281,12 +280,23 @@ export default function RoomDetailsPage() {
                             )}
                         </div>
 
+                        {/* Room Description */}
+                        {room.description && (
+                            <div className="mb-8">
+                                <h3 className="text-lg font-semibold text-foreground mb-4">Description</h3>
+                                <div className="bg-muted/50 border border-border rounded-lg p-6">
+                                    <p className="text-foreground leading-relaxed whitespace-pre-wrap">
+                                        {room.description}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Listing Owner */}
                         <div className="mb-8">
                             <h3 className="text-lg font-semibold text-foreground mb-4">Listing Owner</h3>
                             <OwnerCard 
                                 owner={room.owner}
-                                description={room.description}
                                 onMessageClick={handleMessageOwner}
                                 onCallClick={() => window.open(`tel:${room.owner.phone}`)}
                             />
