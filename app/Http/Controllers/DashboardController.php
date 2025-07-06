@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\User;
 use App\Models\Report;
 use App\Enums\UserRole;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -32,6 +33,7 @@ class DashboardController extends Controller
         $allUsers = User::all();
         $owners = User::where('role', UserRole::OWNER)->get();
         $renters = User::where('role', UserRole::RENTER)->get();
+        $allRooms = Room::all();
 
         $reports = Report::with(['reporter', 'room'])
             ->orderBy('created_at', 'desc')
@@ -51,10 +53,26 @@ class DashboardController extends Controller
 
         return Inertia::render('dashboard/admin-dashboard', [
             'stats' => [
-                'total_users' => $allUsers->count(),
-                'total_owners' => $owners->count(),
-                'total_renters' => $renters->count(),
-                'pending_reports' => Report::where('status', 'pending')->count(),
+                'users' => [
+                    'total' => $allUsers->count(),
+                    'owners' => $owners->count(),
+                    'renters' => $renters->count(),
+                    'new_this_month' => User::where('created_at', '>=', now()->startOfMonth())->count(),
+                ],
+                'rooms' => [
+                    'total' => $allRooms->count(),
+                    'available' => $allRooms->where('is_available', true)->count(),
+                    'occupied' => $allRooms->where('is_available', false)->count(),
+                    'new_this_month' => Room::where('created_at', '>=', now()->startOfMonth())->count(),
+                    'total_value' => $allRooms->sum('price'),
+                ],
+                'reports' => [
+                    'total' => Report::count(),
+                    'pending' => Report::where('status', 'pending')->count(),
+                    'investigating' => Report::where('status', 'investigating')->count(),
+                    'resolved' => Report::where('status', 'resolved')->count(),
+                    'unresolved' => Report::whereIn('status', ['pending', 'investigating'])->count(),
+                ],
             ],
             'reports' => $reports,
             'owners' => $owners->map(function ($owner) {
@@ -62,7 +80,7 @@ class DashboardController extends Controller
                     'id' => $owner->id,
                     'name' => $owner->name,
                     'email' => $owner->email,
-                    'role' => $owner->role->label(),
+                    'role' => $owner->role,
                     'created_at' => $owner->created_at,
                     'rooms_count' => $owner->rooms()->count(),
                 ];
@@ -72,7 +90,7 @@ class DashboardController extends Controller
                     'id' => $renter->id,
                     'name' => $renter->name,
                     'email' => $renter->email,
-                    'role' => $renter->role->label(),
+                    'role' => $renter->role,
                     'created_at' => $renter->created_at,
                     'appointments_count' => $renter->appointments()->count(),
                 ];

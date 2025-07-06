@@ -86,19 +86,19 @@ export default function RoomOwnedPage({ rooms }: RoomOwnedPageProps) {
 
                 {/* Stats Cards */}
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <div className="bg-card border rounded-xl p-6">
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-muted-foreground">Total Rooms</p>
                             <p className="text-2xl font-bold">{rooms.length}</p>
                         </div>
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <div className="bg-card border rounded-xl p-6">
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-muted-foreground">Available Rooms</p>
                             <p className="text-2xl font-bold">{rooms.filter(room => room.is_available).length}</p>
                         </div>
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <div className="bg-card border rounded-xl p-6">
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-muted-foreground">Occupied Rooms</p>
                             <p className="text-2xl font-bold">{rooms.filter(room => !room.is_available).length}</p>
