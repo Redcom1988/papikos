@@ -7,6 +7,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomListingsController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Dashboard\MessageController as DashboardMessageController;
 use App\Http\Controllers\Dashboard\ReportController as DashboardReportController;
 use App\Http\Controllers\Dashboard\RoomController as DashboardRoomController;
@@ -29,6 +30,11 @@ Route::middleware('auth')->group(function () {
     // Bookmarks routes
     Route::post('/bookmarks/toggle', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle');
     Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+
+    // Appointment routes
+    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+    Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
+    Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
 
     // Report routes for users/renters
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
