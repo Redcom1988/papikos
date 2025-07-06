@@ -54,6 +54,7 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     
     // Dashboard reports
     Route::get('/reports', [DashboardReportController::class, 'index'])->name('dashboard.reports');
+    Route::get('/reports-status', [DashboardReportController::class, 'admin'])->name('dashboard.reports.status');
     Route::post('/reports/{report}/respond', [DashboardReportController::class, 'respond'])->name('dashboard.reports.respond');
     
     // Dashboard messages
@@ -63,8 +64,8 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     Route::get('/messages/{userId}', [DashboardMessageController::class, 'getMessages']);
     
     // Dashboard rooms
-    Route::get('/rooms', [DashboardRoomController::class, 'index'])->name('dashboard.rooms.owned');
-    Route::get('/rooms/all', [DashboardRoomController::class, 'all'])->name('dashboard.rooms.all');
+    Route::get('/rooms-owned', [DashboardRoomController::class, 'index'])->name('dashboard.rooms.owned');
+    Route::get('/rooms-all', [DashboardRoomController::class, 'all'])->name('dashboard.rooms.all');
     Route::get('/rooms/create', [DashboardRoomController::class, 'create'])->name('dashboard.rooms.create');
     Route::post('/rooms', [DashboardRoomController::class, 'store'])->name('dashboard.rooms.store');
     Route::get('/rooms/{room}/edit', [DashboardRoomController::class, 'edit'])->name('dashboard.rooms.edit');

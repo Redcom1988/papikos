@@ -72,12 +72,12 @@ export function AppSidebar() {
                 },
                 {
                     title: 'Manage Rooms',
-                    href: '/dashboard/rooms',
+                    href: '/dashboard/rooms-all',
                     icon: Home,
                 },
                 {
                     title: 'Reports',
-                    href: '/dashboard/reports',
+                    href: '/dashboard/reports-status',
                     icon: Flag,
                 },
                 {
@@ -96,7 +96,7 @@ export function AppSidebar() {
             items: [
                 {
                     title: 'My Rooms',
-                    href: '/dashboard/rooms',
+                    href: '/dashboard/rooms-owned',
                     icon: Home,
                 },
                 {
