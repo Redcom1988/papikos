@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { IconButton } from '@/components/ui/icon-button';
 import {
     Dialog,
@@ -35,16 +34,9 @@ export default function RoomDetailsPage() {
     const [showReportDialog, setShowReportDialog] = useState(false);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
     const [surveyMessage, setSurveyMessage] = useState('');
-    const [wantFinancingInfo, setWantFinancingInfo] = useState(false);
     const [reportType, setReportType] = useState('');
     const [reportDescription, setReportDescription] = useState('');
     const [reportImages, setReportImages] = useState<File[]>([]);
-
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('id-ID', {
-            minimumFractionDigits: 0
-        }).format(price);
-    };
 
     const handleScheduleSurvey = async () => {
         if (!auth.user) {
@@ -57,35 +49,42 @@ export default function RoomDetailsPage() {
             return;
         }
 
-        try {
-            const response = await fetch(route('tour.book'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: JSON.stringify({
-                    room_id: room.id,
-                    time_slot: selectedTimeSlot,
-                    message: surveyMessage,
-                    want_financing_info: wantFinancingInfo,
-                }),
-            });
+        // Format the datetime properly for Laravel
+        const formattedDateTime = selectedTimeSlot.includes(':00') 
+            ? selectedTimeSlot 
+            : selectedTimeSlot + ':00';
 
-            const result = await response.json();
-            
-            if (response.ok) {
-                alert(`Survey scheduled successfully for ${selectedTimeSlot}`);
-                setShowScheduleDialog(false);
-                setSelectedTimeSlot('');
-                setSurveyMessage('');
-                setWantFinancingInfo(false);
-            } else {
-                alert(result.error || 'Error scheduling survey');
-            }
+        console.log('Scheduling survey with data:', {
+            room_id: room.id,
+            scheduled_at: formattedDateTime,
+            notes: surveyMessage,
+        });
+
+        try {
+            router.post(route('appointments.store'), {
+                room_id: room.id,
+                scheduled_at: formattedDateTime,
+                notes: surveyMessage,
+            }, {
+                onSuccess: () => {
+                    alert('Survey scheduled successfully!');
+                    setShowScheduleDialog(false);
+                    setSelectedTimeSlot('');
+                    setSurveyMessage('');
+                },
+                onError: (errors) => {
+                    console.error('Validation errors:', errors);
+                    if (errors.message) {
+                        alert(errors.message);
+                    } else {
+                        const errorMessages = Object.values(errors).flat();
+                        alert('Validation errors:\n' + errorMessages.join('\n'));
+                    }
+                }
+            });
         } catch (error) {
             console.error('Error scheduling survey:', error);
-            alert('Error scheduling survey');
+            alert('Error scheduling survey. Please try again.');
         }
     };
 
@@ -163,6 +162,11 @@ export default function RoomDetailsPage() {
             alert('Network error. Please check your connection and try again.');
         }
     };
+        const formatPrice = (price: number) => {
+        return new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 0
+        }).format(price);
+    };
 
     const handleMessageOwner = () => {
         if (!auth.user) {
@@ -180,7 +184,7 @@ export default function RoomDetailsPage() {
 
     return (
         <>
-            <Head title={`${room.title} - Papikos`}>
+            <Head title={`${room.name} - Papikos`}>
                 <meta name="csrf-token" content={document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''} />
             </Head>
             
@@ -194,7 +198,7 @@ export default function RoomDetailsPage() {
                       breadcrumbs={[
                         { title: 'Home', href: route('landing.page') },
                         { title: 'Room Listings', href: route('rooms.index') },
-                        { title: room.title, href: route('room.show', room.id) }
+                        { title: room.name, href: route('room.show', room.id) }
                       ]}
                     />
                   </div>
@@ -212,7 +216,7 @@ export default function RoomDetailsPage() {
                         <div className="mb-8">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex-1">
-                                    <h1 className="text-3xl font-semibold text-foreground mb-2">{room.title}</h1>
+                                    <h1 className="text-3xl font-semibold text-foreground mb-2">{room.name}</h1>
                                     <div className="flex items-center space-x-4">
                                         <span className="text-xl font-semibold text-muted-foreground">{formatPrice(room.price)}/month</span>
                                     </div>
@@ -457,19 +461,9 @@ export default function RoomDetailsPage() {
                                 <Input
                                     value={surveyMessage}
                                     onChange={(e) => setSurveyMessage(e.target.value)}
-                                    placeholder="Enter message"
+                                    placeholder="Any specific questions or requests?"
                                     className="resize-none"
                                 />
-                            </div>
-
-                            <div>
-                                <label className="flex items-center">
-                                    <Checkbox
-                                        checked={wantFinancingInfo}
-                                        onCheckedChange={(checked) => setWantFinancingInfo(checked === true)}
-                                    />
-                                    <span className="ml-2 text-sm text-foreground">I want financing information</span>
-                                </label>
                             </div>
 
                             <Button
@@ -477,7 +471,7 @@ export default function RoomDetailsPage() {
                                 disabled={!selectedTimeSlot}
                                 className="w-full"
                             >
-                                Request this time
+                                Schedule Survey
                             </Button>
                         </div>
                     </DialogContent>
