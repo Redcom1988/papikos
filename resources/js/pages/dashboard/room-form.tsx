@@ -1,28 +1,28 @@
-import { Head, Link, useForm, router } from "@inertiajs/react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import RoomImage from "@/components/ui/room-image";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
-import { 
-    Plus, 
-    X, 
-    Upload,
-    MapPin,
-    DollarSign,
-    SquareIcon,
-    Users,
-    Clock,
+import { Head, router, useForm } from "@inertiajs/react";
+import {
+    AlertTriangle,
     Calendar,
+    Clock,
+    DollarSign,
     ImageIcon,
-    AlertTriangle
+    MapPin,
+    Plus,
+    SquareIcon,
+    Upload,
+    Users,
+    X
 } from "lucide-react";
 import { useState } from "react";
-import RoomImage from "@/components/ui/room-image";
 
 interface Facility {
     id: number;

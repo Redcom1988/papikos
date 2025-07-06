@@ -1,9 +1,8 @@
-import { Head, Link, router } from "@inertiajs/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SearchBar from "@/components/ui/search-bar";
-import { 
+import {
     Table,
     TableBody,
     TableCell,
@@ -13,13 +12,14 @@ import {
 } from "@/components/ui/table";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
-import { 
-    Eye, 
-    Edit, 
-    Trash2, 
-    Users, 
+import { Head, Link, router } from "@inertiajs/react";
+import {
+    Edit,
+    Eye,
+    MapPin,
     SquareIcon,
-    MapPin
+    Trash2,
+    Users
 } from "lucide-react";
 import { useState } from "react";
 

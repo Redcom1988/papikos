@@ -1,6 +1,5 @@
 import type { Room } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Star } from 'lucide-react';
 import BookmarkButton from './bookmark-button';
 import RoomImage from './room-image';
 import Tag from './tag';

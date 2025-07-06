@@ -1,21 +1,21 @@
-import { useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import RoomImage from "@/components/ui/room-image";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
-import { 
-    Plus, 
-    Edit, 
-    Trash2,
-    MapPin,
+import { Head, Link, router } from "@inertiajs/react";
+import {
     DollarSign,
+    Edit,
+    ImageIcon,
+    MapPin,
+    Plus,
     SquareIcon,
-    Users,
-    ImageIcon
+    Trash2,
+    Users
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import RoomImage from "@/components/ui/room-image";
+import { useState } from "react";
 
 interface Room {
     id: number;

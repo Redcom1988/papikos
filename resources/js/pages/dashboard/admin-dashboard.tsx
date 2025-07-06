@@ -1,17 +1,16 @@
-import { Head } from "@inertiajs/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
-import { 
-    Users, 
-    Home, 
-    Flag, 
+import { Head } from "@inertiajs/react";
+import {
     AlertTriangle,
+    Building,
     CheckCircle,
     Clock,
     DollarSign,
-    TrendingUp,
-    Building
+    Flag,
+    Home,
+    Users
 } from "lucide-react";
 
 interface AdminStats {

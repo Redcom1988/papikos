@@ -1,12 +1,12 @@
-import { Head, usePage } from '@inertiajs/react';
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Send, MessageCircle, Loader2, User } from 'lucide-react';
-import AppLayout from '@/layouts/app-layout';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
 import axios from 'axios';
+import { Loader2, MessageCircle, Send, User } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface User {
     id: number;
