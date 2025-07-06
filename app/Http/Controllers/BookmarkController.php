@@ -115,9 +115,9 @@ class BookmarkController extends Controller
         $rooms->getCollection()->transform(function ($room) {
             return [
                 'id' => $room->id,
-                'title' => $room->name,  // This is the key fix
+                'name' => $room->name,
                 'price' => $room->price,
-                'location' => $room->address,
+                'address' => $room->address,
                 'images' => $room->images->pluck('url')->toArray(),
                 'facilities' => $room->facilities->map(function ($facility) {
                     return [

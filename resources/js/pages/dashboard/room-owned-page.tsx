@@ -19,8 +19,8 @@ import RoomImage from "@/components/ui/room-image";
 
 interface Room {
     id: number;
-    title: string;
-    location: string;
+    name: string;
+    address: string;
     price: number;
     formatted_price: string;
     size: number;
@@ -116,7 +116,7 @@ export default function RoomOwnedPage({ rooms }: RoomOwnedPageProps) {
                                     <div className="relative aspect-[4/3] overflow-hidden">
                                         <RoomImage
                                             src={room.images[0].url}
-                                            alt={room.title}
+                                            alt={room.name}
                                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                         />
                                         {room.images.length > 1 && (
@@ -137,10 +137,10 @@ export default function RoomOwnedPage({ rooms }: RoomOwnedPageProps) {
                                     {/* Title and Location */}
                                     <div className="space-y-3 mb-4">
                                         <div className="space-y-1">
-                                            <h3 className="font-semibold text-xl leading-tight">{room.title}</h3>
+                                            <h3 className="font-semibold text-xl leading-tight">{room.name}</h3>
                                             <div className="flex items-center gap-1 text-muted-foreground">
                                                 <MapPin className="w-4 h-4" />
-                                                <span>{room.location}</span>
+                                                <span>{room.address}</span>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-1 text-primary font-bold text-lg">

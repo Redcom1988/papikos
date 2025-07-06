@@ -15,7 +15,7 @@ export default function HeroSection({ room, totalProperties, totalOwners }: Hero
                     {room ? (
                         <RoomImage
                             src={room.primary_image}
-                            alt={`Featured room: ${room.title}`}
+                            alt={`Featured room: ${room.name}`}
                             className="h-full w-full"
                             objectFit="cover"
                             loadingSize="lg"
