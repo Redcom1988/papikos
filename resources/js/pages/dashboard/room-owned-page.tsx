@@ -110,7 +110,18 @@ export default function RoomOwnedPage({ rooms }: RoomOwnedPageProps) {
                 {rooms.length > 0 ? (
                     <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
                         {rooms.map((room) => (
-                            <Card key={room.id} className="overflow-hidden flex flex-col py-0">
+                            <Card
+                                key={room.id}
+                                className="overflow-hidden flex flex-col py-0 cursor-pointer"
+                                onClick={() => router.visit(`/rooms/${room.id}`)}
+                                tabIndex={0}
+                                role="button"
+                                onKeyDown={e => {
+                                    if (e.key === "Enter" || e.key === " ") {
+                                        router.visit(`/dashboard/rooms/${room.id}`);
+                                    }
+                                }}
+                            >
                                 {/* Room Image */}
                                 {room.images && room.images.length > 0 && (
                                     <div className="relative aspect-[4/3] overflow-hidden">
@@ -185,7 +196,10 @@ export default function RoomOwnedPage({ rooms }: RoomOwnedPageProps) {
                                     )}
 
                                     {/* Action Buttons */}
-                                    <div className="flex gap-3 pt-4 border-t mt-auto">
+                                    <div
+                                        className="flex gap-3 pt-4 border-t mt-auto"
+                                        onClick={e => e.stopPropagation()}
+                                    >
                                         <Link href={`/dashboard/rooms/${room.id}/edit`} className="flex-1">
                                             <Button variant="outline" className="w-full">
                                                 <Edit className="w-4 h-4 mr-2" />
