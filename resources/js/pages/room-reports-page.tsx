@@ -1,10 +1,9 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowLeft, Flag, Calendar, User, Image as ImageIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import AppBar from '@/components/ui/appbar';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import type { SharedData, Report } from '@/types';
+import AppBar from '@/components/ui/appbar';
+import { Badge } from '@/components/ui/badge';
+import type { Report, SharedData } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Calendar, Flag, Image as ImageIcon, User } from 'lucide-react';
 
 interface RoomReportsPageProps extends SharedData {
     room: {

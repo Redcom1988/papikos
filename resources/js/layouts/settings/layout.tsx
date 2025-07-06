@@ -1,11 +1,9 @@
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Lock, Palette, User } from 'lucide-react';
-import { type PropsWithChildren } from 'react';
 
 interface SettingsLayoutProps {
     children: React.ReactNode;

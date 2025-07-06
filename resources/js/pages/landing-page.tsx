@@ -1,13 +1,13 @@
+import AppBar from '@/components/ui/appbar';
+import FilterSidebar from '@/components/ui/filter-sidebar';
+import HeroSection from '@/components/ui/hero-section';
+import MobileChat from '@/components/ui/mobile-chat';
+import RoomGrid from '@/components/ui/room-grid';
+import { useBookmarks } from '@/hooks/use-bookmarks';
+import { useFilters } from '@/hooks/use-filters';
 import type { LandingPageProps } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
-import { useBookmarks } from '@/hooks/use-bookmarks';
-import { useFilters } from '@/hooks/use-filters';
-import AppBar from '@/components/ui/appbar';
-import HeroSection from '@/components/ui/hero-section';
-import FilterSidebar from '@/components/ui/filter-sidebar';
-import RoomGrid from '@/components/ui/room-grid';
-import MobileChat from '@/components/ui/mobile-chat';
 
 export default function LandingPage() {
     const { auth, rooms, heroRoom, totalProperties, totalOwners, facilities, filters: initialFilters, userBookmarks = [] } = usePage<LandingPageProps>().props;

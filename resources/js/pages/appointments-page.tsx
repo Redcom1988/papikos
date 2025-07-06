@@ -1,11 +1,11 @@
-import { Head, usePage, router } from '@inertiajs/react';
-import { useState } from 'react';
-import { Calendar, Clock, MapPin, MessageSquare, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import AppBar from '@/components/ui/appbar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { type SharedData } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
+import { Calendar, CheckCircle, Clock, MapPin, MessageSquare, Trash2, XCircle } from 'lucide-react';
+import { useState } from 'react';
 
 interface Appointment {
     id: number;
