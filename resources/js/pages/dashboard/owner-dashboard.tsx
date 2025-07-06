@@ -35,25 +35,25 @@ export default function OwnerDashboard({ stats, appointments }: OwnerDashboardPr
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 {/* Stats Cards */}
                 <div className="grid auto-rows-min gap-4 md:grid-cols-4">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <div className="bg-card border rounded-xl p-6">
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-muted-foreground">Total Rooms</p>
                             <p className="text-2xl font-bold">{stats.total_rooms}</p>
                         </div>
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <div className="bg-card border rounded-xl p-6">
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-muted-foreground">Available Rooms</p>
                             <p className="text-2xl font-bold">{stats.available_rooms}</p>
                         </div>
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <div className="bg-card border rounded-xl p-6">
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-muted-foreground">Occupied Rooms</p>
                             <p className="text-2xl font-bold">{stats.occupied_rooms}</p>
                         </div>
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-6">
+                    <div className="bg-card border rounded-xl p-6">
                         <div className="space-y-2">
                             <p className="text-sm font-medium text-muted-foreground">Total Appointments</p>
                             <p className="text-2xl font-bold">{stats.total_appointments}</p>
@@ -62,13 +62,13 @@ export default function OwnerDashboard({ stats, appointments }: OwnerDashboardPr
                 </div>
 
                 {/* Recent Appointments */}
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl border">
+                <div className="bg-card border rounded-xl flex-1 overflow-hidden">
                     <div className="p-6">
                         <h3 className="text-lg font-semibold mb-4">Recent Appointments</h3>
                         <div className="space-y-4">
                             {appointments.length > 0 ? (
                                 appointments.map((appointment) => (
-                                    <div key={appointment.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                    <div key={appointment.id} className="flex items-center justify-between p-4 bg-muted/30 border rounded-lg">
                                         <div>
                                             <p className="font-medium">{appointment.room_name}</p>
                                             <p className="text-sm text-muted-foreground">by {appointment.user_name}</p>

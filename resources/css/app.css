@@ -116,24 +116,24 @@
 
 .dark {
     /* Dark Mode - Warmer & More Comfortable */
-    --background: oklch(16% 0.014 285);               /* Warmer dark blue-gray background */
+    --background: oklch(12% 0.014 285);               /* Darker warmer background */
     --foreground: oklch(95% 0.006 285);               /* Slightly warm white text */
-    --card: oklch(20% 0.016 285);                     /* Warmer elevated surfaces */
+    --card: oklch(16% 0.016 285);                     /* Darker elevated surfaces */
     --card-foreground: oklch(92% 0.006 285);          /* Warm white text on cards */
-    --popover: oklch(18% 0.015 285);                  /* Slightly warmer popovers */
+    --popover: oklch(14% 0.015 285);                  /* Darker popovers */
     --popover-foreground: oklch(95% 0.006 285);       /* Light text on popovers */
     --primary: oklch(70% 0.18 258);                   /* Bright blue for dark mode */
     --primary-foreground: oklch(98% 0 0);             /* White text on primary */
-    --secondary: oklch(28% 0.018 285);                /* Warmer secondary */
+    --secondary: oklch(22% 0.018 285);                /* Darker secondary */
     --secondary-foreground: oklch(92% 0.006 285);     /* Light text on secondary */
-    --muted: oklch(24% 0.016 285);                    /* Warmer muted background */
+    --muted: oklch(18% 0.016 285);                    /* Darker muted background */
     --muted-foreground: oklch(70% 0.012 285);         /* Warmer medium text */
-    --accent: oklch(32% 0.02 285);                    /* Warmer accent */
+    --accent: oklch(26% 0.02 285);                    /* Darker accent */
     --accent-foreground: oklch(95% 0.006 285);        /* Light text on accent */
     --destructive: oklch(58% 0.22 25);                /* Red for dark mode */
     --destructive-foreground: oklch(98% 0 0);         /* Light text on destructive */
-    --border: oklch(35% 0.022 285);                   /* Warmer borders with better contrast */
-    --input: oklch(22% 0.016 285);                    /* Warmer input background */
+    --border: oklch(28% 0.022 285);                   /* Darker borders */
+    --input: oklch(18% 0.016 285);                    /* Darker input background */
     --ring: oklch(70% 0.18 258);                      /* Bright primary for focus rings */
     --chart-1: oklch(70% 0.24 264);                   /* Adjusted chart colors for dark mode */
     --chart-2: oklch(70% 0.17 162);                   
@@ -141,13 +141,13 @@
     --chart-4: oklch(63% 0.27 304);                   
     --chart-5: oklch(65% 0.25 16);                    
     --radius: 0.75rem;                                /* Same radius as light mode */
-    --sidebar: oklch(14% 0.012 285);                  /* Warmer darker sidebar */
+    --sidebar: oklch(10% 0.012 285);                  /* Much darker sidebar */
     --sidebar-foreground: oklch(90% 0.006 285);       /* Light sidebar text */
     --sidebar-primary: oklch(70% 0.18 258);           /* Bright primary in sidebar */
     --sidebar-primary-foreground: oklch(98% 0 0);     /* White text on sidebar primary */
-    --sidebar-accent: oklch(26% 0.018 285);           /* Warmer accent in sidebar */
+    --sidebar-accent: oklch(20% 0.018 285);           /* Darker accent in sidebar */
     --sidebar-accent-foreground: oklch(90% 0.006 285); /* Light text on sidebar accent */
-    --sidebar-border: oklch(32% 0.02 285);            /* Better contrast borders */
+    --sidebar-border: oklch(24% 0.02 285);            /* Darker borders */
     --sidebar-ring: oklch(70% 0.18 258);              /* Bright primary for sidebar focus */
 }
 

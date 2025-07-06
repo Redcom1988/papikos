@@ -157,12 +157,12 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Reports List */}
-                <div className="space-y-4">
+                <div className="space-y-6">
                     {reports.data.length > 0 ? (
                         reports.data.map((report) => (
                             <div
                                 key={report.id}
-                                className="border border-border rounded-lg p-6 space-y-4"
+                                className="bg-card border rounded-lg p-6 space-y-4"
                             >
                                 <div className="flex items-start justify-between">
                                     <div className="space-y-2">
@@ -233,9 +233,9 @@ export default function ReportsPage() {
 
                                 {/* Admin Notes */}
                                 {report.admin_notes && (
-                                    <div className="space-y-2 bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg">
-                                        <h4 className="font-medium text-blue-800 dark:text-blue-200">Admin Notes:</h4>
-                                        <p className="text-blue-700 dark:text-blue-300">{report.admin_notes}</p>
+                                    <div className="space-y-2 bg-muted/30 border border-blue-500/20 p-4 rounded-lg">
+                                        <h4 className="font-medium text-blue-600 dark:text-blue-400">Admin Notes:</h4>
+                                        <p className="text-muted-foreground">{report.admin_notes}</p>
                                     </div>
                                 )}
 

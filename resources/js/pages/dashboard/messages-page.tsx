@@ -4,7 +4,6 @@ import { Send, MessageCircle, Loader2, User } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import axios from 'axios';
@@ -58,7 +57,6 @@ export default function Messages({ users }: MessagesProps) {
 
         setIsSending(true);
 
-        // Declare optimisticMessage here so it's accessible in catch block
         const optimisticMessage = {
             id: Date.now(),
             sender: auth.user.id,
@@ -79,11 +77,9 @@ export default function Messages({ users }: MessagesProps) {
 
             await axios.post('/messages', payload);
             
-            // Don't call fetchMessages with loader - just refresh silently
             fetchMessages(userId, false);
         } catch (error) {
             console.error('Failed to send message:', error);
-            // Remove the optimistic message on error
             setMessages((prev) => prev.filter(msg => msg.id !== optimisticMessage.id));
         } finally {
             setIsSending(false);
@@ -112,10 +108,8 @@ export default function Messages({ users }: MessagesProps) {
     useEffect(() => {
         if (!selectedUser) return;
 
-        // Initial fetch with loader
         fetchMessages(selectedUser.id, true);
 
-        // Set up polling for new messages (without loader for background updates)
         const interval = setInterval(() => {
             fetchMessages(selectedUser.id, false);
         }, 2000);
@@ -140,10 +134,10 @@ export default function Messages({ users }: MessagesProps) {
 
                 {/* Main Content */}
                 <div className="flex gap-6 h-[calc(100vh-12rem)]">
-                    {/* Users List - Expanded */}
-                    <div className="w-[28rem] border border-border rounded-lg p-6 flex flex-col">
+                    {/* Users List */}
+                    <div className="w-[28rem] bg-card border rounded-lg p-6 flex flex-col">
                         <div className="flex items-center gap-2 mb-4">
-                            <User className="w-5 h-5" />
+                            <User className="w-5 h-5 text-muted-foreground" />
                             <h2 className="text-lg font-semibold">Contacts</h2>
                             <Badge variant="secondary" className="ml-auto">
                                 {users.length}
@@ -151,21 +145,21 @@ export default function Messages({ users }: MessagesProps) {
                         </div>
                         
                         <div className="flex-1 overflow-y-auto">
-                            <div className="space-y-4">
+                            <div className="space-y-2">
                                 {users.length > 0 ? (
                                     users.map((user) => (
                                         <div
                                             key={user.id}
                                             onClick={() => setSelectedUser(user)}
-                                            className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                                            className={`p-3 rounded-lg border cursor-pointer transition-all duration-200 ${
                                                 selectedUser?.id === user.id
-                                                    ? 'bg-primary/10 border-primary'
-                                                    : 'hover:bg-muted/50 border-border'
+                                                    ? 'bg-accent border-accent-foreground/20 shadow-sm'
+                                                    : 'hover:bg-accent/50 border-transparent'
                                             }`}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                                    <User className="w-6 h-6 text-primary" />
+                                                <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <User className="w-6 h-6 text-muted-foreground" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <h4 className="font-medium text-base mb-1">{user.name}</h4>
@@ -190,14 +184,14 @@ export default function Messages({ users }: MessagesProps) {
                     </div>
 
                     {/* Chat Area */}
-                    <div className="flex-1 border border-border rounded-lg flex flex-col min-w-0">
+                    <div className="flex-1 bg-card border rounded-lg flex flex-col min-w-0">
                         {selectedUser ? (
                             <>
                                 {/* Chat Header */}
-                                <div className="border-b border-border p-4 bg-muted/20 flex-shrink-0">
+                                <div className="border-b p-4 bg-muted/30 flex-shrink-0">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <User className="w-5 h-5 text-primary" />
+                                        <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                                            <User className="w-5 h-5 text-muted-foreground" />
                                         </div>
                                         <div className="min-w-0">
                                             <h3 className="font-semibold truncate">{selectedUser.name}</h3>
@@ -231,11 +225,11 @@ export default function Messages({ users }: MessagesProps) {
                                                         }`}
                                                     >
                                                         <div
-                                                            className={`max-w-[70%] ${
+                                                            className={`max-w-[70%] rounded-lg p-3 ${
                                                                 message.sender === auth.user.id
                                                                     ? 'bg-primary text-primary-foreground'
-                                                                    : 'bg-muted'
-                                                            } rounded-lg p-3 ${
+                                                                    : 'bg-muted/50 border'
+                                                            } ${
                                                                 message.id > 1000000000000 ? 'opacity-80' : ''
                                                             }`}
                                                         >
@@ -243,7 +237,7 @@ export default function Messages({ users }: MessagesProps) {
                                                             <div className="flex items-center justify-between mt-2">
                                                                 <p className={`text-xs ${
                                                                     message.sender === auth.user.id 
-                                                                        ? 'text-primary-foreground/70' 
+                                                                        ? 'text-primary-foreground/60' 
                                                                         : 'text-muted-foreground'
                                                                 }`}>
                                                                     {new Date(message.created_at).toLocaleTimeString([], {
@@ -252,7 +246,7 @@ export default function Messages({ users }: MessagesProps) {
                                                                     })}
                                                                 </p>
                                                                 {message.sender === auth.user.id && message.id > 1000000000000 && isSending && (
-                                                                    <Loader2 className="w-3 h-3 animate-spin opacity-60 ml-2" />
+                                                                    <Loader2 className="w-3 h-3 animate-spin text-primary-foreground/60 ml-2" />
                                                                 )}
                                                             </div>
                                                         </div>
@@ -273,7 +267,7 @@ export default function Messages({ users }: MessagesProps) {
                                 </div>
 
                                 {/* Input Area */}
-                                <div className="border-t border-border p-4 flex-shrink-0">
+                                <div className="border-t p-4 bg-muted/20 flex-shrink-0">
                                     <div className="flex items-center gap-3">
                                         <Input
                                             value={inputValue}
