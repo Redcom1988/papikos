@@ -74,12 +74,7 @@ export function AppSidebar() {
                     title: 'Manage Rooms',
                     href: '/admin/rooms',
                     icon: Home,
-                },
-                {
-                    title: 'Reports',
-                    href: '/admin/reports',
-                    icon: Flag,
-                },
+                }
             ]
         }
     ];
@@ -106,17 +101,17 @@ export function AppSidebar() {
             items: [
                 {
                     title: 'Appointments',
-                    href: '/owner/appointments',
+                    href: '/dashboard/appointments',
                     icon: Calendar,
                 },
                 {
                     title: 'Reports',
-                    href: '/owner/reports',
+                    href: '/dashboard/reports',
                     icon: Flag,
                 },
                 {
                     title: 'Messages',
-                    href: '/messages',
+                    href: '/dashboard/messages',
                     icon: MessageCircle,
                 },
             ]
