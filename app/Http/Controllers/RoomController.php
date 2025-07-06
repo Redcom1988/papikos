@@ -118,7 +118,7 @@ class RoomController extends Controller
         return Inertia::render('room-reports', [
             'room' => [
                 'id' => $room->id,
-                'title' => $room->name,
+                'name' => $room->name,
                 'address' => $room->address,
             ],
             'reports' => $reports

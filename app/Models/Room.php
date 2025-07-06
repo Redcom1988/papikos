@@ -222,7 +222,7 @@ class Room extends Model
 
         return [
             'id' => $room->id,
-            'title' => $room->name,
+            'name' => $room->name,
             'description' => $room->description,
             'price' => $room->price,
             'address' => $room->address,

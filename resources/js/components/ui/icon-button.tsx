@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 
 interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'default' | 'danger';
-    size?: 'sm' | 'md' | 'lg' | 'xl';
+    size?: 'sm' | 'md' | 'lg' | 'ml' | 'xl';
     children: React.ReactNode;
 }
 
@@ -17,6 +17,7 @@ export default function IconButton({
     const sizeClasses = {
         sm: 'w-7 h-7',
         md: 'w-8 h-8',
+        ml: 'w-9 h-9',
         lg: 'w-10 h-10',
         xl: 'w-12 h-12'
     };

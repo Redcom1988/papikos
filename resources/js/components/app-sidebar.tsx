@@ -127,13 +127,13 @@ export function AppSidebar() {
         sections = ownerSections;
     } 
 
-    const footerNavItems: NavItem[] = [
-        {
-            title: 'Settings',
-            href: '/dashboard/settings/profile',
-            icon: Settings,
-        },
-    ];
+    // const footerNavItems: NavItem[] = [
+    //     {
+    //         title: 'Settings',
+    //         href: '/dashboard/settings/profile',
+    //         icon: Settings,
+    //     },
+    // ];
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -165,7 +165,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                {/* <NavFooter items={footerNavItems} className="mt-auto" /> */}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
