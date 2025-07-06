@@ -298,7 +298,6 @@ export default function RoomDetailsPage() {
                             <OwnerCard 
                                 owner={room.owner}
                                 onMessageClick={handleMessageOwner}
-                                onCallClick={() => window.open(`tel:${room.owner.phone}`)}
                             />
                         </div>
 
@@ -306,93 +305,95 @@ export default function RoomDetailsPage() {
                         {room.reports && room.reports.length > 0 && (
                             <div className="mb-8">
                                 <h3 className="text-lg font-semibold text-foreground mb-4">Recent Reports & Responses</h3>
-                                <div className="space-y-4">
-                                    {room.reports.map((report: Report) => (
-                                        <div key={report.id} className="bg-muted/30 border border-border rounded-lg p-4">
-                                            <div className="flex items-start justify-between mb-3">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-medium text-foreground capitalize">
-                                                        {report.type.replace('_', ' ')}
-                                                    </span>
-                                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                                        report.status === 'resolved' 
-                                                            ? 'bg-green-100 text-green-800' 
-                                                            : report.status === 'investigating'
-                                                            ? 'bg-yellow-100 text-yellow-800'
-                                                            : 'bg-gray-100 text-gray-800'
-                                                    }`}>
-                                                        {report.status}
-                                                    </span>
-                                                </div>
-                                                <span className="text-xs text-muted-foreground">
-                                                    {report.created_at}
-                                                </span>
-                                            </div>
-                                            
-                                            <div className="mb-3">
-                                                <p className="text-sm text-foreground mb-2">
-                                                    <span className="font-medium">Report:</span> {report.description}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Reported by {report.reporter.name}
-                                                </p>
-                                            </div>
-
-                                            {/* Report Images */}
-                                            {report.images && report.images.length > 0 && (
-                                                <div className="mb-3">
-                                                    <div className="flex gap-2 overflow-x-auto">
-                                                        {report.images.map((image) => (
-                                                            <img
-                                                                key={image.id}
-                                                                src={image.url}
-                                                                alt="Report evidence"
-                                                                className="w-16 h-16 object-cover rounded border border-border flex-shrink-0"
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Owner Response */}
-                                            {report.owner_response && (
-                                                <div className="bg-background border border-border rounded p-3 mt-3">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <span className="text-xs font-medium text-primary">
-                                                            Owner Response
+                                <div className="bg-muted/50 border border-border rounded-lg p-6">
+                                    <div className="space-y-6">
+                                        {room.reports.map((report: Report) => (
+                                            <div key={report.id} className="bg-background border border-border rounded-lg p-4">
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-medium text-foreground capitalize">
+                                                            {report.type.replace('_', ' ')}
                                                         </span>
-                                                        {report.owner_responded_at && (
-                                                            <span className="text-xs text-muted-foreground">
-                                                                {new Date(report.owner_responded_at).toLocaleDateString()}
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                                            report.status === 'resolved' 
+                                                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
+                                                                : report.status === 'investigating'
+                                                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+                                                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                                                        }`}>
+                                                            {report.status}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {report.created_at}
+                                                    </span>
+                                                </div>
+                                                
+                                                <div className="mb-3">
+                                                    <p className="text-sm text-foreground mb-2">
+                                                        <span className="font-medium">Report:</span> {report.description}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Reported by {report.reporter.name}
+                                                    </p>
+                                                </div>
+
+                                                {/* Report Images */}
+                                                {report.images && report.images.length > 0 && (
+                                                    <div className="mb-3">
+                                                        <div className="flex gap-2 overflow-x-auto">
+                                                            {report.images.map((image) => (
+                                                                <img
+                                                                    key={image.id}
+                                                                    src={image.url}
+                                                                    alt="Report evidence"
+                                                                    className="w-16 h-16 object-cover rounded border border-border flex-shrink-0"
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Owner Response */}
+                                                {report.owner_response && (
+                                                    <div className="bg-muted/50 border border-border rounded-lg p-3 mt-3">
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <span className="text-xs font-medium text-primary">
+                                                                Owner Response
                                                             </span>
+                                                            {report.owner_responded_at && (
+                                                                <span className="text-xs text-muted-foreground">
+                                                                    {new Date(report.owner_responded_at).toLocaleDateString()}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-sm text-foreground mb-2">
+                                                            {report.owner_response}
+                                                        </p>
+                                                        {report.owner_response_action && (
+                                                            <div className="flex items-center gap-1">
+                                                                <span className="text-xs text-muted-foreground">Action taken:</span>
+                                                                <span className="text-xs font-medium text-foreground capitalize">
+                                                                    {report.owner_response_action.replace('_', ' ')}
+                                                                </span>
+                                                            </div>
                                                         )}
                                                     </div>
-                                                    <p className="text-sm text-foreground mb-2">
-                                                        {report.owner_response}
-                                                    </p>
-                                                    {report.owner_response_action && (
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-xs text-muted-foreground">Action taken:</span>
-                                                            <span className="text-xs font-medium text-foreground capitalize">
-                                                                {report.owner_response_action.replace('_', ' ')}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                                
-                                {/* View More Reports Link */}
-                                <div className="mt-4 text-center">
-                                    <Link 
-                                        href={`/rooms/${room.id}/reports`}
-                                        className="text-sm text-primary hover:text-primary/80 inline-flex items-center gap-1"
-                                    >
-                                        View all reports
-                                        <ArrowRight className="w-3 h-3" />
-                                    </Link>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    
+                                    {/* View More Reports Link */}
+                                    <div className="mt-6 pt-4 border-t border-border text-center">
+                                        <Link 
+                                            href={`/rooms/${room.id}/reports`}
+                                            className="text-sm text-primary hover:text-primary/80 inline-flex items-center gap-1"
+                                        >
+                                            View all reports
+                                            <ArrowRight className="w-3 h-3" />
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         )}

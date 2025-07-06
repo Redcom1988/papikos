@@ -1,4 +1,5 @@
-import { MessageCircle, Phone } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
+import { IconButton } from '@/components/ui/icon-button';
 
 interface OwnerCardProps {
     owner: {
@@ -8,20 +9,16 @@ interface OwnerCardProps {
         phone?: string;
         avatar?: string;
     };
-    description?: string;
     onMessageClick: () => void;
-    onCallClick: () => void;
 }
 
 export default function OwnerCard({ 
     owner, 
-    description, 
     onMessageClick, 
-    onCallClick 
 }: OwnerCardProps) {
     return (
-        <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-start space-x-4">
+        <div className="bg-muted/50 border border-border rounded-lg p-6">
+            <div className="flex items-center space-x-4">
                 {/* Owner Avatar */}
                 <div className="flex-shrink-0">
                     <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
@@ -41,37 +38,21 @@ export default function OwnerCard({
 
                 {/* Owner Info */}
                 <div className="flex-1 min-w-0">
-                    <h4 className="text-lg font-semibold text-foreground mb-1">{owner.name}</h4>
-                    <p className="text-sm text-muted-foreground mb-3">{owner.email}</p>
-                    
-                    {description && (
-                        <p className="text-sm text-foreground mb-4 leading-relaxed">
-                            {description}
-                        </p>
-                    )}
+                    <h4 className="text-lg font-semibold text-foreground">{owner.name}</h4>
+                    <p className="text-sm text-muted-foreground">{owner.email}</p>
+                    <p className="text-sm text-muted-foreground">{owner.phone}</p>
+                </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex space-x-3">
-                        <button 
-                            onClick={onMessageClick}
-                            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md shadow-sm hover:bg-primary/90 transition-colors"
-                            title="Send message"
-                        >
-                            <MessageCircle className="w-4 h-4" />
-                            Message
-                        </button>
-                        
-                        {owner.phone && (
-                            <button 
-                                onClick={onCallClick}
-                                className="flex items-center gap-2 px-4 py-2 border border-primary text-primary rounded-md shadow-sm hover:bg-muted transition-colors"
-                                title="Call owner"
-                            >
-                                <Phone className="w-4 h-4" />
-                                Call
-                            </button>
-                        )}
-                    </div>
+                {/* Message Button */}
+                <div className="flex-shrink-0">
+                    <IconButton
+                        onClick={onMessageClick}
+                        title="Send message"
+                        size="xl"
+                        className="transition-all duration-200 hover:scale-105"
+                    >
+                        <MessageCircle className="w-5 h-5 transition-all duration-200 text-foreground hover:text-primary hover:drop-shadow-lg" />
+                    </IconButton>
                 </div>
             </div>
         </div>
