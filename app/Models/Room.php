@@ -169,7 +169,7 @@ class Room extends Model
                 ->through(function ($room) {
                     return [
                         'id' => $room->id,
-                        'title' => $room->name,
+                        'name' => $room->name,
                         'price' => $room->price,
                         'address' => $room->address,
                         'images' => $room->images->pluck('url')->toArray(),
@@ -194,7 +194,7 @@ class Room extends Model
         return $query->take(6)->get()->map(function ($room) {
             return [
                 'id' => $room->id,
-                'title' => $room->name,
+                'name' => $room->name,
                 'price' => $room->price,
                 'address' => $room->address,
                 'images' => $room->images->pluck('url')->toArray(),
@@ -226,6 +226,7 @@ class Room extends Model
             'description' => $room->description,
             'price' => $room->price,
             'address' => $room->address,
+            'is_available' => $room->is_available,
             'embedded_map_link' => $room->embedded_map_link,
             'size' => $room->size,
             'max_occupancy' => $room->max_occupancy,
