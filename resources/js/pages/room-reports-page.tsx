@@ -9,7 +9,7 @@ import type { SharedData, Report } from '@/types';
 interface RoomReportsPageProps extends SharedData {
     room: {
         id: number;
-        title: string;
+        name: string;
         address: string;
     };
     reports: {
@@ -56,7 +56,7 @@ export default function RoomReportsPage() {
 
     return (
         <>
-            <Head title={`Reports for ${room.title} - Papikos`} />
+            <Head title={`Reports for ${room.name} - Papikos`} />
             
             <div className="min-h-screen bg-background text-foreground">
                 <AppBar auth={auth} />
@@ -68,7 +68,7 @@ export default function RoomReportsPage() {
                             breadcrumbs={[
                                 { title: 'Home', href: route('landing.page') },
                                 { title: 'Room Listings', href: route('rooms.index') },
-                                { title: room.title, href: route('room.show', room.id) },
+                                { title: room.name, href: route('room.show', room.id) },
                                 { title: 'Reports', href: route('room.reports', room.id) }
                             ]}
                         />
@@ -83,7 +83,7 @@ export default function RoomReportsPage() {
                                 <Flag className="w-6 h-6 text-primary" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold text-foreground mb-2">Reports for {room.title}</h1>
+                                <h1 className="text-2xl font-bold text-foreground mb-2">Reports for {room.name}</h1>
                                 <p className="text-muted-foreground mb-1">{room.address}</p>
                                 <p className="text-sm text-muted-foreground">
                                     {reports.meta.total} {reports.meta.total === 1 ? 'report' : 'reports'} found

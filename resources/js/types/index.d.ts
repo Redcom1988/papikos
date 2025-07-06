@@ -46,9 +46,9 @@ export interface User {
 // Room and listings related interfaces
 export interface Room {
     id: number;
-    title: string;
+    name: string;
     price: number;
-    location: string;
+    address: string;
     images: string[];
     facilities: Facility[];
     description: string;
@@ -80,7 +80,7 @@ export interface Report {
 
 export interface RoomDetails {
     id: number;
-    title: string;
+    name: string;
     description: string;
     price: number;
     address: string;
@@ -94,7 +94,7 @@ export interface RoomDetails {
 
 export interface HeroRoom {
     id: number;
-    title: string;
+    name: string;
     price: number;
     location: string;
     primary_image: string | null;

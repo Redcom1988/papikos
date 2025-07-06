@@ -27,8 +27,8 @@ class RoomController extends Controller
             ->map(function ($room) {
                 return [
                     'id' => $room->id,
-                    'title' => $room->name,
-                    'location' => $room->address,
+                    'name' => $room->name,
+                    'address' => $room->address,
                     'description' => $room->description,
                     'price' => $room->price,
                     'formatted_price' => $room->formatted_price,

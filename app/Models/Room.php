@@ -97,9 +97,9 @@ class Room extends Model
 
         return [
             'id' => $room->id,
-            'title' => $room->name,
+            'name' => $room->name,
             'price' => $room->price,
-            'location' => $room->address,
+            'address' => $room->address,
             'primary_image' => $room->primaryImage?->url,
             'description' => $room->description,
         ];
@@ -171,7 +171,7 @@ class Room extends Model
                         'id' => $room->id,
                         'title' => $room->name,
                         'price' => $room->price,
-                        'location' => $room->address,
+                        'address' => $room->address,
                         'images' => $room->images->pluck('url')->toArray(),
                         'facilities' => $room->facilities->map(function ($facility) {
                             return [
@@ -196,7 +196,7 @@ class Room extends Model
                 'id' => $room->id,
                 'title' => $room->name,
                 'price' => $room->price,
-                'location' => $room->address,
+                'address' => $room->address,
                 'images' => $room->images->pluck('url')->toArray(),
                 'facilities' => $room->facilities->map(function ($facility) {
                     return [
@@ -225,7 +225,7 @@ class Room extends Model
             'title' => $room->name,
             'description' => $room->description,
             'price' => $room->price,
-            'location' => $room->address,
+            'address' => $room->address,
             'embedded_map_link' => $room->embedded_map_link,
             'size' => $room->size,
             'max_occupancy' => $room->max_occupancy,

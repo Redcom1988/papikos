@@ -31,7 +31,7 @@ export default function RoomCard({
                 <Link href={`/rooms/${room.id}`} className="absolute inset-0 z-0">
                     <RoomImage
                         src={room.primary_image}
-                        alt={room.title}
+                        alt={room.name}
                         className="h-full transition-transform duration-300 group-hover:scale-105"
                         objectFit="cover"
                     />
@@ -50,12 +50,12 @@ export default function RoomCard({
 
             <div className="p-4">
                 {/* Location */}
-                <p className="text-sm text-muted-foreground mb-1">{room.location}</p>
+                <p className="text-sm text-muted-foreground mb-1">{room.address}</p>
                 
                 {/* Room Title */}
                 <Link href={`/rooms/${room.id}`} className="block">
                     <h3 className="font-semibold text-lg text-card-foreground mb-2 hover:text-primary transition-colors line-clamp-2">
-                        {room.title}
+                        {room.name}
                     </h3>
                 </Link>
                 
