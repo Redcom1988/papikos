@@ -11,8 +11,8 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Dashboard\MessageController as DashboardMessageController;
 use App\Http\Controllers\Dashboard\ReportController as DashboardReportController;
 use App\Http\Controllers\Dashboard\RoomController as DashboardRoomController;
+use App\Http\Controllers\Dashboard\AppointmentController as DashboardAppointmentController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // Home/Landing page
 Route::get('/', [HomeController::class, 'index'])->name('landing.page');
@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
     
     // Message fetching route (used by both dashboard and mobile chat)
     Route::get('/messages/{userId}', [DashboardMessageController::class, 'getMessages'])->name('messages.get');
+
 });
 
 // Dashboard routes
@@ -68,6 +69,11 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     Route::get('/messages/users', [DashboardMessageController::class, 'getChatUsers']);
     Route::get('/messages/all-users', [DashboardMessageController::class, 'getAllUsers']);
     Route::get('/messages/{userId}', [DashboardMessageController::class, 'getMessages']);
+
+        // Owner appointment routes
+    Route::get('/appointments', [DashboardAppointmentController::class, 'index'])->name('dashboard.appointments');
+    Route::patch('/appointments/{appointment}/cancel', [DashboardAppointmentController::class, 'cancel'])->name('dashboard.appointments.cancel');
+    Route::patch('/appointments/{appointment}/complete', [DashboardAppointmentController::class, 'complete'])->name('dashboard.appointments.complete');
     
     // Dashboard rooms
     Route::get('/rooms-owned', [DashboardRoomController::class, 'index'])->name('dashboard.rooms.owned');
