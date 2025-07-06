@@ -39,3 +39,6 @@ export default function IconButton({
         </button>
     );
 }
+
+export type { IconButtonProps };
+export { IconButton };

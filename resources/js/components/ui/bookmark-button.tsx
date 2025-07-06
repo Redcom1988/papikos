@@ -1,5 +1,6 @@
 import { Bookmark } from 'lucide-react';
 import IconButton from './icon-button';
+import { cn } from '@/lib/utils';
 
 interface BookmarkButtonProps {
     roomId: number;
@@ -24,29 +25,29 @@ export default function BookmarkButton({
         lg: 'w-5 h-5'
     };
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.preventDefault();
-        event.stopPropagation();
-        onBookmark(roomId, event);
-    };
-
     return (
         <IconButton
-            onClick={handleClick}
-            title={isBookmarked ? "Remove from bookmarks" : "Add to bookmarks"}
+            onClick={(e) => onBookmark(roomId, e)}
             disabled={isLoading}
-            className={className}
+            className={cn(
+                isBookmarked 
+                    ? 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800' 
+                    : '',
+                className
+            )}
             size={size}
         >
             {isLoading ? (
-                <div className={`${iconSizes[size]} border-2 border-muted-foreground/30 border-t-primary rounded-full animate-spin`}></div>
+                <div className={cn('animate-spin rounded-full border-2 border-current border-t-transparent', iconSizes[size])} />
             ) : (
-                <Bookmark 
-                    className={`${iconSizes[size]} transition-colors ${
+                <Bookmark
+                    className={cn(
+                        iconSizes[size], 
+                        'transition-all duration-200',
                         isBookmarked 
-                            ? 'text-primary fill-primary dark:text-primary dark:fill-primary' 
-                            : 'text-muted-foreground hover:text-primary dark:text-muted-foreground dark:hover:text-primary'
-                    }`}
+                            ? 'fill-current text-blue-600 dark:text-blue-400 drop-shadow-lg' 
+                            : 'text-foreground hover:text-blue-600 hover:drop-shadow-lg dark:hover:text-blue-400'
+                    )} 
                 />
             )}
         </IconButton>
