@@ -82,6 +82,9 @@ export interface RoomDetails {
     id: number;
     name: string;
     description: string;
+    size: number;
+    max_occupancy: number;
+    is_available: boolean;
     price: number;
     address: string;
     embedded_map_link?: string;

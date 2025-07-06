@@ -38,6 +38,8 @@ export default function RoomDetailsPage() {
     const [reportDescription, setReportDescription] = useState('');
     const [reportImages, setReportImages] = useState<File[]>([]);
 
+    console.log('Room details page loaded with room:', room);
+
     const handleScheduleSurvey = async () => {
         if (!auth.user) {
             router.visit(route('login'));
@@ -214,25 +216,66 @@ export default function RoomDetailsPage() {
                         
                         {/* Room Info with Action Buttons */}
                         <div className="mb-8">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex-1">
-                                    <h1 className="text-3xl font-semibold text-foreground mb-2">{room.name}</h1>
-                                    <div className="flex items-center space-x-4">
-                                        <span className="text-xl font-semibold text-muted-foreground">{formatPrice(room.price)}/month</span>
+                            <div className="flex justify-between items-start gap-6 mb-6">
+                                <div className="flex-1 min-w-0">
+                                    {/* Location */}
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span className="text-muted-foreground font-medium">{room.address}</span>
+                                    </div>
+                                    
+                                    {/* Room Name */}
+                                    <h1 className="text-4xl font-bold text-foreground mb-4 leading-tight">{room.name}</h1>
+                                    
+                                    {/* Price */}
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-3xl font-bold text-primary">Rp {formatPrice(room.price)}</span>
+                                        <span className="text-lg text-muted-foreground font-medium">/month</span>
+                                    </div>
+                                    
+                                    {/* Room Details */}
+                                    <div className="flex items-center gap-6 mt-4 text-sm text-muted-foreground">
+                                        {room.size && (
+                                            <div className="flex items-center gap-1">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                                </svg>
+                                                <span>{room.size} m²</span>
+                                            </div>
+                                        )}
+                                        {room.max_occupancy && (
+                                            <div className="flex items-center gap-1">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                                                </svg>
+                                                <span>Max {room.max_occupancy} person{room.max_occupancy > 1 ? 's' : ''}</span>
+                                            </div>
+                                        )}
+                                        <div className="flex items-center gap-1">
+                                            <div className={`w-2 h-2 rounded-full ${room.is_available ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                            <span className={room.is_available ? 'text-green-600' : 'text-red-300'}>
+                                                {room.is_available ? 'Available' : 'Not Available'}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                {/* Right side content - stacked vertically */}
-                                <div className="flex flex-col items-end space-y-3">
+                                {/* Right side content - Action buttons and icons */}
+                                <div className="flex flex-col items-end gap-4">
                                     {/* Icons Row */}
-                                    <div className="flex items-center space-x-3">
+                                    <div className="flex items-center gap-3">
                                         {/* Report Button */}
                                         <IconButton
                                             onClick={handleReportClick}
                                             disabled={!auth.user}
                                             title={auth.user ? "Report this listing" : "Login to report this listing"}
+                                            className="hover:bg-muted/70 hover:border-border"
+                                            size="ml"
                                         >
-                                            <Flag className="w-4 h-4 transition-all duration-200 text-foreground hover:text-red-600 hover:drop-shadow-lg dark:hover:text-red-400" />
+                                            <Flag className="w-5 h-5 text-muted-foreground hover:text-red-600 dark:hover:text-red-400" />
                                         </IconButton>
 
                                         <BookmarkButton
@@ -240,21 +283,22 @@ export default function RoomDetailsPage() {
                                             isBookmarked={isBookmarked(room.id)}
                                             isLoading={bookmarkLoading === room.id}
                                             onBookmark={handleBookmark}
-                                            size="md"
+                                            size="ml"
                                         />
-                                        
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="flex space-x-2">
+                                    <div className="flex gap-3">                                        
                                         <Button 
-                                            variant="outline" 
                                             onClick={handleSurveySchedule}
                                             size="lg"
-                                            disabled={room.available_tours.length === 0}
-                                            className="border-border text-foreground hover:bg-muted disabled:opacity-50"
+                                            disabled={!room.is_available || room.available_tours.length === 0}
+                                            className="min-w-[160px] shadow-lg"
                                         >
-                                            Schedule A Survey
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            Schedule Survey
                                         </Button>
                                     </div>
                                 </div>
