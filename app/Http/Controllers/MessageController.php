@@ -29,7 +29,7 @@ class MessageController extends Controller
             ->select('id', 'name', 'email')
             ->get();
 
-        return Inertia::render('dashboard/messages', [
+        return Inertia::render('dashboard/messages-page', [
             'users' => $users
         ]);
     }
