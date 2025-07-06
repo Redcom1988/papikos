@@ -332,7 +332,7 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
                                     value={data.description}
                                     onChange={e => setData('description', e.target.value)}
                                     placeholder="Describe your room in detail..."
-                                    rows={4}
+                                    rows={8}
                                     className={`w-full px-3 py-2 mt-1 border border-gray-600 rounded-md resize-none ${errors.description ? 'border-red-500' : ''}`}
                                 />
                                 {errors.description && (
