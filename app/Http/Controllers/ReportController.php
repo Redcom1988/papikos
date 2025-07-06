@@ -4,154 +4,115 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use App\Models\ReportImage;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class ReportController extends Controller
 {
-    public function store(Request $request)
+    /**
+     * Show report form for a specific room
+     */
+    public function create(Room $room)
     {
-        // Add auth check
         if (!Auth::check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return redirect()->route('login');
         }
 
-        $request->validate([
+        return Inertia::render('reports/create', [
+            'room' => [
+                'id' => $room->id,
+                'name' => $room->name,
+                'address' => $room->address,
+                'owner' => [
+                    'name' => $room->owner->name,
+                ],
+            ]
+        ]);
+    }
+
+    /**
+     * Store a new report (for renters/users)
+     */
+    public function store(Request $request)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to submit a report');
+        }
+
+        $validated = $request->validate([
             'room_id' => 'required|exists:rooms,id',
             'type' => 'required|in:inappropriate_content,fake_listing,fraud,safety_concern,other',
             'description' => 'required|string|max:1000',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB per image
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Create the report
-        $report = Report::create([
-            'reporter_id' => Auth::id(), 
-            'room_id' => $request->room_id,
-            'type' => $request->type,
-            'description' => $request->description,
-            'status' => 'pending',
-        ]);
+        try {
+            // Create the report
+            $report = Report::create([
+                'reporter_id' => Auth::id(),
+                'room_id' => $validated['room_id'],
+                'type' => $validated['type'],
+                'description' => $validated['description'],
+                'status' => 'pending',
+            ]);
 
-        // Handle image uploads
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                // Generate unique filename
-                $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
-                
-                // Store the image in public/storage/report-images
-                $path = $image->storeAs('report-images', $filename, 'public');
-                
-                // Save image record with full URL
-                ReportImage::create([
-                    'report_id' => $report->id,
-                    'url' => Storage::url($path), // This creates /storage/report-images/filename.jpg
-                ]);
+            // Handle image uploads
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $filename = Str::random(40) . '.' . $image->getClientOriginalExtension();
+                    $path = $image->storeAs('reports', $filename, 'public');
+                    
+                    ReportImage::create([
+                        'report_id' => $report->id,
+                        'url' => '/storage/' . $path,
+                    ]);
+                }
             }
+
+            return back()->with('success', 'Report submitted successfully. We will review it shortly.');
+
+        } catch (\Exception $e) {
+            Log::error('Error creating report: ' . $e->getMessage());
+            return back()->withErrors(['message' => 'An error occurred while submitting your report. Please try again.']);
+        }
+    }
+
+    /**
+     * Show user's own reports
+     */
+    public function index()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
 
-        return response()->json([
-            'message' => 'Report submitted successfully',
-            'report_id' => $report->id
+        $reports = Report::with(['room', 'images'])
+            ->where('reporter_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return Inertia::render('reports/index', [
+            'reports' => $reports
         ]);
     }
 
-    public function index(Request $request)
-    {
-        $user = $request->user();
-        
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-        
-        $query = Report::with(['reporter', 'room', 'images']);
-        
-        // If owner, only show reports about their rooms
-        if ($user->isOwner()) {
-            $query->whereHas('room', function($q) use ($user) {
-                $q->where('owner_id', $user->id);
-            });
-        }
-        // TODO: Add admin check for viewing all reports
-        
-        $reports = $query->orderBy('created_at', 'desc')->paginate(15);
-        
-        return response()->json($reports);
-    }
-
+    /**
+     * Show specific report details
+     */
     public function show(Report $report)
     {
-        $user = $report->user();
-        
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-        
-        // Check if user can view this report
-        if ($user->isOwner() && $report->room->owner_id !== $user->id) {
-            abort(403, 'Unauthorized');
-        }
-        
-        $report->load(['reporter', 'room', 'images']);
-        
-        return response()->json($report);
-    }
-
-    public function update(Request $request, Report $report)
-    {
-        $user = Auth::user();
-        
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-        
-        // Only allow status updates for now
-        $request->validate([
-            'status' => 'required|in:pending,investigating,resolved,dismissed',
-            'admin_notes' => 'nullable|string|max:1000',
-        ]);
-
-        $report->update([
-            'status' => $request->status,
-            'admin_notes' => $request->admin_notes,
-        ]);
-
-        return response()->json([
-            'message' => 'Report updated successfully',
-            'report' => $report->fresh(['reporter', 'room', 'images'])
-        ]);
-    }
-
-    // Add method for owner responses
-    public function respond(Request $request, Report $report)
-    {
-        $user = $request->user();
-        
-        if (!$user || !$user->isOwner()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if (!Auth::check() || $report->reporter_id !== Auth::id()) {
+            abort(403);
         }
 
-        // Check if user owns the reported room
-        if ($report->room->owner_id !== $user->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $request->validate([
-            'action' => 'required|in:issue_resolved,listing_updated,additional_info,dispute',
-            'response' => 'required|string|max:1000',
-        ]);
-
-        $report->update([
-            'owner_response' => $request->response,
-            'owner_response_action' => $request->action,
-            'owner_responded_at' => now(),
-            'status' => $request->action === 'issue_resolved' ? 'resolved' : $report->status,
-        ]);
-
-        return response()->json([
-            'message' => 'Response submitted successfully',
-            'report' => $report->fresh(['reporter', 'room', 'images'])
+        return Inertia::render('reports/show', [
+            'report' => $report->load(['room', 'images'])
         ]);
     }
 }
