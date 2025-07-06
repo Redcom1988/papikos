@@ -59,39 +59,38 @@ export interface Room {
     max_occupancy: number;
 }
 
+export interface ReportImage {
+    id: number;
+    url: string;
+}
+
+export interface Report {
+    id: number;
+    type: string;
+    description: string;
+    status: 'pending' | 'investigating' | 'resolved' | 'dismissed';
+    owner_response?: string;
+    owner_response_action?: string;
+    owner_responded_at?: string;
+    created_at: string;
+    reporter: {
+        name: string;
+    };
+    images: ReportImage[];
+}
+
 export interface RoomDetails {
     id: number;
     title: string;
     description: string;
     price: number;
-    location: string;
+    address: string;
     embedded_map_link?: string;
-    size: number;
-    max_occupancy: number;
-    reviewCount: number;
-    images: Array<{
-        id: number;
-        url: string;
-        caption: string;
-        is_primary: boolean;
-    }>;
-    facilities: Array<{
-        id: number;
-        name: string;
-        description?: string;
-        icon?: string;
-    }>;
-    owner: {
-        id: number;
-        name: string;
-        phone: string;
-        email: string;
-    };
-    available_tours: Array<{
-        datetime: string;
-        label: string;
-        display_time: string;
-    }>;
+    available_tours: TourSlot[];
+    images: RoomImage[];
+    owner: Owner;
+    facilities: Facility[];
+    reports?: Report[]; // Add this line
 }
 
 export interface HeroRoom {

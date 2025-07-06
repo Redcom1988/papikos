@@ -1,17 +1,14 @@
-import type { RoomDetailsPageProps } from '@/types';
+import type { RoomDetailsPageProps, Report } from '@/types';
 import { Head, Link, usePage, router } from '@inertiajs/react';
 import { useState, useEffect, useRef } from 'react';
 import { 
     Flag, 
     ArrowRight, 
-    ChevronRight, 
-    Star, 
-    Home, 
-    Globe 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { IconButton } from '@/components/ui/icon-button';
 import {
     Dialog,
     DialogContent,
@@ -100,6 +97,14 @@ export default function RoomDetailsPage() {
         setShowScheduleDialog(true);
     }
 
+    const handleReportClick = () => {
+        if (!auth.user) {
+            router.visit(route('login'));
+            return;
+        }
+        setShowReportDialog(true);
+    };
+
     const handleSubmitReport = async () => {
         if (!reportType) {
             alert('Please select a report type');
@@ -131,43 +136,33 @@ export default function RoomDetailsPage() {
                 formData.append(`images[${index}]`, file);
             });
 
-            const response = await fetch(route('reports.store'), {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            // Use Inertia's router for form submission
+            router.post(route('reports.store'), formData, {
+                onSuccess: (page) => {
+                    alert('Report submitted successfully. Thank you for helping keep our community safe.');
+                    setShowReportDialog(false);
+                    setReportType('');
+                    setReportDescription('');
+                    setReportImages([]);
                 },
+                onError: (errors) => {
+                    if (errors.message) {
+                        alert(errors.message);
+                    } else {
+                        const errorMessages = Object.values(errors).flat().join('\n');
+                        alert('Validation errors:\n' + errorMessages);
+                    }
+                },
+                onFinish: () => {
+                    // Any cleanup if needed
+                }
             });
 
-            const result = await response.json();
-            
-            if (response.ok) {
-                alert('Report submitted successfully. Thank you for helping keep our community safe.');
-                setShowReportDialog(false);
-                setReportType('');
-                setReportDescription('');
-                setReportImages([]);
-            } else {
-                // Handle validation errors
-                if (result.errors) {
-                    const errorMessages = Object.values(result.errors).flat().join('\n');
-                    alert('Validation errors:\n' + errorMessages);
-                } else {
-                    alert(result.message || 'Error submitting report');
-                }
-            }
         } catch (error) {
             console.error('Error submitting report:', error);
-            alert('Error submitting report');
+            alert('Network error. Please check your connection and try again.');
         }
     };
-
-    // Also add scroll restoration when dialog close
-    useEffect(() => {
-        if (!showScheduleDialog && !showReportDialog) {
-            document.body.style.overflow = 'auto';
-        }
-    }, [showScheduleDialog, showReportDialog]);
 
     const handleMessageOwner = () => {
         if (!auth.user) {
@@ -229,15 +224,14 @@ export default function RoomDetailsPage() {
                                     {/* Icons Row */}
                                     <div className="flex items-center space-x-3">
                                         {/* Report Button */}
-                                        <Button
-                                            variant="icon"
-                                            size="icon"
-                                            onClick={() => setShowReportDialog(true)}
-                                            title="Report this listing"
+                                        <IconButton
+                                            onClick={handleReportClick}
+                                            disabled={!auth.user}
+                                            title={auth.user ? "Report this listing" : "Login to report this listing"}
                                         >
-                                            <Flag className="w-4 h-4" />
-                                        </Button>
-                                        
+                                            <Flag className="w-4 h-4 transition-all duration-200 text-foreground hover:text-red-600 hover:drop-shadow-lg dark:hover:text-red-400" />
+                                        </IconButton>
+
                                         <BookmarkButton
                                             roomId={room.id}
                                             isBookmarked={isBookmarked(room.id)}
@@ -297,6 +291,101 @@ export default function RoomDetailsPage() {
                                 onCallClick={() => window.open(`tel:${room.owner.phone}`)}
                             />
                         </div>
+
+                        {/* Recent Reports Section */}
+                        {room.reports && room.reports.length > 0 && (
+                            <div className="mb-8">
+                                <h3 className="text-lg font-semibold text-foreground mb-4">Recent Reports & Responses</h3>
+                                <div className="space-y-4">
+                                    {room.reports.map((report: Report) => (
+                                        <div key={report.id} className="bg-muted/30 border border-border rounded-lg p-4">
+                                            <div className="flex items-start justify-between mb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-medium text-foreground capitalize">
+                                                        {report.type.replace('_', ' ')}
+                                                    </span>
+                                                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                                        report.status === 'resolved' 
+                                                            ? 'bg-green-100 text-green-800' 
+                                                            : report.status === 'investigating'
+                                                            ? 'bg-yellow-100 text-yellow-800'
+                                                            : 'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                        {report.status}
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {report.created_at}
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="mb-3">
+                                                <p className="text-sm text-foreground mb-2">
+                                                    <span className="font-medium">Report:</span> {report.description}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Reported by {report.reporter.name}
+                                                </p>
+                                            </div>
+
+                                            {/* Report Images */}
+                                            {report.images && report.images.length > 0 && (
+                                                <div className="mb-3">
+                                                    <div className="flex gap-2 overflow-x-auto">
+                                                        {report.images.map((image) => (
+                                                            <img
+                                                                key={image.id}
+                                                                src={image.url}
+                                                                alt="Report evidence"
+                                                                className="w-16 h-16 object-cover rounded border border-border flex-shrink-0"
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Owner Response */}
+                                            {report.owner_response && (
+                                                <div className="bg-background border border-border rounded p-3 mt-3">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="text-xs font-medium text-primary">
+                                                            Owner Response
+                                                        </span>
+                                                        {report.owner_responded_at && (
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {new Date(report.owner_responded_at).toLocaleDateString()}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm text-foreground mb-2">
+                                                        {report.owner_response}
+                                                    </p>
+                                                    {report.owner_response_action && (
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-xs text-muted-foreground">Action taken:</span>
+                                                            <span className="text-xs font-medium text-foreground capitalize">
+                                                                {report.owner_response_action.replace('_', ' ')}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                                
+                                {/* View More Reports Link */}
+                                <div className="mt-4 text-center">
+                                    <Link 
+                                        href={`/rooms/${room.id}/reports`}
+                                        className="text-sm text-primary hover:text-primary/80 inline-flex items-center gap-1"
+                                    >
+                                        View all reports
+                                        <ArrowRight className="w-3 h-3" />
+                                    </Link>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Location Map */}
                         {room.embedded_map_link && (
