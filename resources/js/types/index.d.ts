@@ -49,7 +49,6 @@ export interface Room {
     title: string;
     price: number;
     location: string;
-    reviewCount: number;
     images: string[];
     facilities: Facility[];
     description: string;

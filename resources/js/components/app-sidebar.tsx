@@ -67,14 +67,24 @@ export function AppSidebar() {
             items: [
                 {
                     title: 'Manage Users',
-                    href: '/admin/users',
+                    href: '/dashboard/users',
                     icon: Users,
                 },
                 {
                     title: 'Manage Rooms',
-                    href: '/admin/rooms',
+                    href: '/dashboard/rooms',
                     icon: Home,
-                }
+                },
+                {
+                    title: 'Reports',
+                    href: '/dashboard/reports',
+                    icon: Flag,
+                },
+                {
+                    title: 'Messages',
+                    href: '/dashboard/messages',
+                    icon: MessageCircle,
+                },
             ]
         }
     ];
@@ -86,19 +96,9 @@ export function AppSidebar() {
             items: [
                 {
                     title: 'My Rooms',
-                    href: '/owner/rooms',
+                    href: '/dashboard/rooms',
                     icon: Home,
                 },
-                {
-                    title: 'Add Room',
-                    href: '/owner/rooms/create',
-                    icon: PlusCircle,
-                },
-            ]
-        },
-        {
-            title: 'Activity',
-            items: [
                 {
                     title: 'Appointments',
                     href: '/dashboard/appointments',
