@@ -6,8 +6,10 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomListingsController;
 use App\Http\Controllers\MessageController;
-use App\Http\Controllers\Dashboard\ReportsController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Dashboard\MessageController as DashboardMessageController;
+use App\Http\Controllers\Dashboard\ReportController as DashboardReportController;
+use App\Http\Controllers\Dashboard\RoomController as DashboardRoomController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -16,6 +18,12 @@ Route::get('/', [HomeController::class, 'index'])->name('landing.page');
 
 // Room listings page
 Route::get('/rooms', [RoomListingsController::class, 'index'])->name('rooms.index');
+
+// Individual room routes
+Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('room.show');
+Route::get('/rooms/{room}/reports', [RoomController::class, 'showReports'])->name('room.reports');
+Route::get('/api/rooms/{room}', [RoomController::class, 'getRoomDetails'])->name('room.details');
+Route::post('/api/tours/book', [RoomController::class, 'bookTour'])->name('tour.book')->middleware('auth');
 
 Route::middleware('auth')->group(function () {
     // Bookmarks routes
@@ -28,33 +36,41 @@ Route::middleware('auth')->group(function () {
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
     Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
 
-    // Message routes - Keep original for mobile chat compatibility
-    Route::prefix('messages')->group(function () {
-        Route::get('/{userId}', [MessageController::class, 'getMessages'])->name('messages.get');
-        Route::post('/', [MessageController::class, 'store'])->name('messages.store');
-    });
-
-    // Dashboard message routes - Add dashboard-specific route
-    Route::get('/dashboard/messages', [MessageController::class, 'index'])->name('dashboard.messages.index');
-
-    // Mobile chat API
-    Route::get('/api/chat-users', [MessageController::class, 'getChatUsers']);
-    Route::get('/api/users', [MessageController::class, 'getAllUsers']);
+    // API Message routes (for sending messages)
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+    
+    // Mobile chat API routes
+    Route::get('/api/chat-users', [DashboardMessageController::class, 'getChatUsers']);
+    Route::get('/api/users', [DashboardMessageController::class, 'getAllUsers']);
+    
+    // Message fetching route (used by both dashboard and mobile chat)
+    Route::get('/messages/{userId}', [DashboardMessageController::class, 'getMessages'])->name('messages.get');
 });
 
-// Individual room routes
-Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('room.show');
-Route::get('/rooms/{room}/reports', [RoomController::class, 'showReports'])->name('room.reports');
-Route::get('/api/rooms/{room}', [RoomController::class, 'getRoomDetails'])->name('room.details');
-Route::post('/api/tours/book', [RoomController::class, 'bookTour'])->name('tour.book')->middleware('auth');
-
-// Dashboard routes for owners
+// Dashboard routes
 Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () {
-    Route::get('/reports', [ReportsController::class, 'index'])->name('dashboard.reports');
-    Route::post('/reports/{report}/respond', [ReportsController::class, 'respond'])->name('dashboard.reports.respond');
+    // Dashboard main
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Dashboard reports
+    Route::get('/reports', [DashboardReportController::class, 'index'])->name('dashboard.reports');
+    Route::post('/reports/{report}/respond', [DashboardReportController::class, 'respond'])->name('dashboard.reports.respond');
+    
+    // Dashboard messages
+    Route::get('/messages', [DashboardMessageController::class, 'index'])->name('dashboard.messages');
+    Route::get('/messages/users', [DashboardMessageController::class, 'getChatUsers']);
+    Route::get('/messages/all-users', [DashboardMessageController::class, 'getAllUsers']);
+    Route::get('/messages/{userId}', [DashboardMessageController::class, 'getMessages']);
+    
+    // Dashboard rooms
+    Route::get('/rooms', [DashboardRoomController::class, 'index'])->name('dashboard.rooms.owned');
+    Route::get('/rooms/all', [DashboardRoomController::class, 'all'])->name('dashboard.rooms.all');
+    Route::get('/rooms/create', [DashboardRoomController::class, 'create'])->name('dashboard.rooms.create');
+    Route::post('/rooms', [DashboardRoomController::class, 'store'])->name('dashboard.rooms.store');
+    Route::get('/rooms/{room}/edit', [DashboardRoomController::class, 'edit'])->name('dashboard.rooms.edit');
+    Route::put('/rooms/{room}', [DashboardRoomController::class, 'update'])->name('dashboard.rooms.update');
+    Route::delete('/rooms/{room}', [DashboardRoomController::class, 'destroy'])->name('dashboard.rooms.destroy');
 });
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__.'/auth.php';
 require __DIR__.'/settings.php';
