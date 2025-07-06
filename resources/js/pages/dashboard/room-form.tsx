@@ -99,6 +99,7 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
     const breadcrumbs = getRoomBreadcrumbs(room, auth.user.role);
     const [selectedFiles, setSelectedFiles] = useState<FileWithPreview[]>([]);
     const [deletedImages, setDeletedImages] = useState<number[]>([]);
+    const [dragOver, setDragOver] = useState(false);
 
     const { data, setData, post, put, processing, errors, clearErrors } = useForm({
         name: room?.name || '',
@@ -118,6 +119,12 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
 
     const existingImages = room?.images?.filter(img => !deletedImages.includes(img.id)) || [];
 
+    // Combine existing and new images for display
+    const allImages = [
+        ...existingImages.map(img => ({ type: 'existing' as const, data: img })),
+        ...selectedFiles.map(file => ({ type: 'new' as const, data: file }))
+    ];
+
     const validateImage = (file: File): string | null => {
         if (file.size > MAX_FILE_SIZE) {
             return 'File size must be less than 2MB';
@@ -130,13 +137,12 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
         return null;
     };
 
-    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
+    const processFiles = (files: File[]) => {
         const validFiles: FileWithPreview[] = [];
         const errorMessages: string[] = [];
 
         // Check total image limit
-        if (existingImages.length + selectedFiles.length + files.length > MAX_IMAGES) {
+        if (allImages.length + files.length > MAX_IMAGES) {
             errorMessages.push(`Maximum ${MAX_IMAGES} images allowed`);
             return;
         }
@@ -159,9 +165,40 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
         if (validFiles.length > 0) {
             setSelectedFiles(prev => [...prev, ...validFiles]);
         }
+    };
 
-        // Reset input
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        processFiles(files);
         e.target.value = '';
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragOver(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragOver(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragOver(false);
+        
+        const files = Array.from(e.dataTransfer.files);
+        processFiles(files);
+    };
+
+    const handleImageRemove = (index: number, type: 'existing' | 'new') => {
+        if (type === 'existing') {
+            const imageId = existingImages[index].id;
+            setDeletedImages(prev => [...prev, imageId]);
+        } else {
+            const newIndex = index - existingImages.length;
+            setSelectedFiles(prev => prev.filter((_, i) => i !== newIndex));
+        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -240,14 +277,6 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
     const handleTimeSlotRemove = (index: number) => {
         const timeSlots = data.available_tour_times.filter((_, i) => i !== index);
         setData('available_tour_times', timeSlots);
-    };
-
-    const handleImageRemove = (index: number) => {
-        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-    };
-
-    const handleExistingImageRemove = (imageId: number) => {
-        setDeletedImages(prev => [...prev, imageId]);
     };
 
     return (
@@ -343,14 +372,13 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
                             <div>
                                 <Label htmlFor="address" className="text-sm font-medium">Address *</Label>
                                 <div className="relative">
-                                    <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                                     <textarea
                                         id="address"
                                         value={data.address}
                                         onChange={e => setData('address', e.target.value)}
                                         placeholder="Enter full address"
                                         rows={2}
-                                        className={`w-full pl-10 pr-3 py-2 mt-1 border border-gray-600 rounded-md ${errors.address ? 'border-red-500' : ''}`}
+                                        className={`w-full px-3 py-2 mt-1 border border-gray-600 rounded-md ${errors.address ? 'border-red-500' : ''}`}
                                     />
                                 </div>
                                 {errors.address && <p className="text-sm text-red-500 mt-1">{errors.address}</p>}
@@ -522,45 +550,15 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
                                 <ImageIcon className="w-5 h-5" />
                                 Images
                                 <Badge variant="outline" className="ml-2">
-                                    {existingImages.length + selectedFiles.length}/{MAX_IMAGES}
+                                    {allImages.length}/{MAX_IMAGES}
                                 </Badge>
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {/* Existing Images */}
-                            {existingImages.length > 0 && (
-                                <div>
-                                    <Label className="text-sm font-medium">Current Images</Label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-                                        {existingImages.map((image) => (
-                                            <div key={image.id} className="relative group">
-                                                <RoomImage
-                                                    src={image.url}
-                                                    alt="Room"
-                                                    className="w-full h-60 rounded-lg"
-                                                />
-                                                {image.is_primary && (
-                                                    <Badge className="absolute top-1 left-1 text-xs">Primary</Badge>
-                                                )}
-                                                <Button
-                                                    type="button"
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    className="absolute top-1 right-1 w-6 h-6 p-0 opacity-0 group-hover:opacity-100"
-                                                    onClick={() => handleExistingImageRemove(image.id)}
-                                                >
-                                                    <X className="w-3 h-3" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* New Images */}
+                            {/* Upload Area */}
                             <div>
                                 <Label htmlFor="images" className="text-sm font-medium">
-                                    {room ? 'Add New Images' : 'Upload Images'}
+                                    Upload Images
                                 </Label>
                                 <div className="mt-2">
                                     <Input
@@ -573,40 +571,61 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
                                     />
                                     <Label
                                         htmlFor="images"
-                                        className="flex items-center justify-center p-6 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors"
+                                        onDragOver={handleDragOver}
+                                        onDragLeave={handleDragLeave}
+                                        onDrop={handleDrop}
+                                        className={`flex items-center justify-center p-6 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                                            dragOver 
+                                                ? 'border-primary bg-primary/5' 
+                                                : 'border-border hover:border-primary/50'
+                                        }`}
                                     >
                                         <div className="text-center">
                                             <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
                                             <p className="text-sm text-muted-foreground">
-                                                Click to upload images or drag and drop
+                                                {dragOver 
+                                                    ? 'Drop images here...' 
+                                                    : 'Click to upload images or drag and drop'
+                                                }
                                             </p>
                                         </div>
                                     </Label>
                                 </div>
-
-                                {selectedFiles.length > 0 && (
-                                    <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-3">
-                                        {selectedFiles.map((file, index) => (
-                                            <div key={index} className="relative group">
-                                                <RoomImage
-                                                    src={URL.createObjectURL(file)}
-                                                    alt="Preview"
-                                                    className="w-full h-20 rounded-lg"
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    className="absolute top-1 right-1 w-6 h-6 p-0 opacity-0 group-hover:opacity-100"
-                                                    onClick={() => handleImageRemove(index)}
-                                                >
-                                                    <X className="w-3 h-3" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
                             </div>
+
+                            {/* Images Grid */}
+                            {allImages.length > 0 && (
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {allImages.map((imageItem, index) => (
+                                        <div key={index} className="relative group">
+                                            <RoomImage
+                                                src={
+                                                    imageItem.type === 'existing' 
+                                                        ? imageItem.data.url 
+                                                        : (imageItem.data as FileWithPreview).preview || URL.createObjectURL(imageItem.data as File)
+                                                }
+                                                alt={imageItem.type === 'existing' ? 'Room' : 'Preview'}
+                                                className="w-full h-96 rounded-lg"
+                                            />
+                                            {imageItem.type === 'existing' && (imageItem.data as RoomImageType).is_primary && (
+                                                <Badge className="absolute top-1 left-1 text-xs">Primary</Badge>
+                                            )}
+                                            {imageItem.type === 'new' && (
+                                                <Badge variant="secondary" className="absolute top-1 left-1 text-xs">New</Badge>
+                                            )}
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                size="sm"
+                                                className="absolute top-1 right-1 w-6 h-6 p-0 opacity-0 group-hover:opacity-100"
+                                                onClick={() => handleImageRemove(index, imageItem.type)}
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
