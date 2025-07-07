@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { AlertCircle, CheckCircle, Clock, Image as ImageIcon, MapPin, MessageSquare, User } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, Image as ImageIcon, MapPin, MessageSquare, User, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -105,14 +105,14 @@ export default function ReportsPage() {
         }
     };
 
-    const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    const getStatusVariant = (status: string): "default" | "warning" | "destructive" | "outline" | "secondary" => {
         switch (status) {
             case 'pending':
-                return 'secondary';
+                return 'warning';
             case 'investigating':
-                return 'default';
-            case 'resolved':
                 return 'outline';
+            case 'resolved':
+                return 'default';
             case 'dismissed':
                 return 'destructive';
             default:
@@ -149,7 +149,7 @@ export default function ReportsPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">Reports</h1>
+                        <h1 className="text-3xl font-bold">Reports</h1>
                         <p className="text-muted-foreground">
                             Manage reports for your properties
                         </p>
@@ -168,14 +168,7 @@ export default function ReportsPage() {
                                     <div className="space-y-2">
                                         <div className="flex items-center gap-2">
                                             <h3 className="font-semibold text-lg">{getTypeLabel(report.type)}</h3>
-                                            <Badge variant={getStatusVariant(report.status)}>
-                                                <div className="flex items-center gap-1">
-                                                    {getStatusIcon(report.status)}
-                                                    {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
-                                                </div>
-                                            </Badge>
                                         </div>
-                                        
                                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                             <div className="flex items-center gap-1">
                                                 <MapPin className="w-4 h-4" />
@@ -185,8 +178,19 @@ export default function ReportsPage() {
                                                 <User className="w-4 h-4" />
                                                 <span>Reported by: {report.reporter.name}</span>
                                             </div>
+                                            <div className="flex items-center gap-1">
+                                                <Calendar className="w-4 h-4" />
+                                                <span>{new Date(report.created_at).toLocaleDateString()}</span>
+                                            </div>
                                         </div>
                                     </div>
+                                    <Badge
+                                        variant={getStatusVariant(report.status)}
+                                        className="min-h-[2rem] flex items-center"
+                                    >
+                                        {getStatusIcon(report.status)}
+                                        {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
+                                    </Badge>
                                 </div>
 
                                 <div className="space-y-2">

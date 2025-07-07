@@ -13,7 +13,10 @@ import {
     Plus,
     SquareIcon,
     Trash2,
-    Users
+    Users,
+    Home, 
+    CheckCircle2, 
+    XCircle 
 } from "lucide-react";
 import { useState } from "react";
 
@@ -71,7 +74,7 @@ export default function RoomOwnedPage({ rooms }: RoomOwnedPageProps) {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">My Rooms</h1>
+                        <h1 className="text-3xl font-bold">My Rooms</h1>
                         <p className="text-muted-foreground">
                             Manage your room listings and bookings
                         </p>
@@ -85,25 +88,40 @@ export default function RoomOwnedPage({ rooms }: RoomOwnedPageProps) {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="bg-card border rounded-xl p-6">
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-muted-foreground">Total Rooms</p>
-                            <p className="text-2xl font-bold">{rooms.length}</p>
-                        </div>
-                    </div>
-                    <div className="bg-card border rounded-xl p-6">
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-muted-foreground">Available Rooms</p>
-                            <p className="text-2xl font-bold">{rooms.filter(room => room.is_available).length}</p>
-                        </div>
-                    </div>
-                    <div className="bg-card border rounded-xl p-6">
-                        <div className="space-y-2">
-                            <p className="text-sm font-medium text-muted-foreground">Occupied Rooms</p>
-                            <p className="text-2xl font-bold">{rooms.filter(room => !room.is_available).length}</p>
-                        </div>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="py-0">
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-4">
+                                <Home className="w-8 h-8 text-gray-500" />
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Total</p>
+                                    <p className="text-2xl font-bold">{rooms.length}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="py-0">
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-4">
+                                <CheckCircle2 className="w-8 h-8 text-green-600" />
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Available</p>
+                                    <p className="text-2xl font-bold">{rooms.filter(room => room.is_available).length}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="py-0">
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-4">
+                                <XCircle className="w-8 h-8 text-destructive" />
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Occupied</p>
+                                    <p className="text-2xl font-bold">{rooms.filter(room => !room.is_available).length}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Rooms Grid */}
@@ -137,7 +155,7 @@ export default function RoomOwnedPage({ rooms }: RoomOwnedPageProps) {
                                         )}
                                         <Badge 
                                             variant={room.is_available ? "default" : "secondary"}
-                                            className="absolute top-3 left-3"
+                                            className="absolute top-3 left-3 min-h-[2rem]"
                                         >
                                             {room.is_available ? "Available" : "Occupied"}
                                         </Badge>

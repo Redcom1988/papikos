@@ -85,19 +85,6 @@ export default function ReportsStatusPage({ reports, filters }: ReportsStatusPag
         }
     };
 
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'resolved':
-                return <CheckCircle className="w-4 h-4 text-green-500" />;
-            case 'investigating':
-                return <Clock className="w-4 h-4 text-blue-500" />;
-            case 'dismissed':
-                return <XCircle className="w-4 h-4 text-red-500" />;
-            default:
-                return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
-        }
-    };
-
     const handleViewReport = (report: Report) => {
         setSelectedReport(report);
         setData({
@@ -223,7 +210,6 @@ export default function ReportsStatusPage({ reports, filters }: ReportsStatusPag
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
-                                                {getStatusIcon(report.status)}
                                                 <Badge variant={getStatusBadgeVariant(report.status)}>
                                                     {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
                                                 </Badge>
@@ -298,8 +284,7 @@ export default function ReportsStatusPage({ reports, filters }: ReportsStatusPag
                                     </div>
                                     <div>
                                         <Label className="font-medium text-xs text-muted-foreground">STATUS</Label>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            {getStatusIcon(selectedReport.status)}
+                                        <div className="mt-1">
                                             <Badge variant={getStatusBadgeVariant(selectedReport.status)}>
                                                 {selectedReport.status.charAt(0).toUpperCase() + selectedReport.status.slice(1)}
                                             </Badge>
