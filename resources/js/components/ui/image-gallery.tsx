@@ -16,10 +16,13 @@ interface ImageGalleryProps {
 }
 
 export default function ImageGallery({ images, className = "" }: ImageGalleryProps) {
+    const sortedImages = [...images].sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0));
+    // This puts the image with is_primary === true at the front
+
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [showModal, setShowModal] = useState(false);
 
-    if (!images || images.length === 0) {
+    if (!sortedImages || sortedImages.length === 0) {
         return (
             <div className={`bg-gray-200 rounded-lg flex items-center justify-center h-full ${className}`}>
                 <span className="text-gray-500">No images available</span>
@@ -27,14 +30,14 @@ export default function ImageGallery({ images, className = "" }: ImageGalleryPro
         );
     }
 
-    const currentImage = images[selectedImageIndex] || images[0];
+    const currentImage = sortedImages[selectedImageIndex] || sortedImages[0];
 
     const nextImage = () => {
-        setSelectedImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0);
+        setSelectedImageIndex(prev => prev < sortedImages.length - 1 ? prev + 1 : 0);
     };
 
     const prevImage = () => {
-        setSelectedImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1);
+        setSelectedImageIndex(prev => prev > 0 ? prev - 1 : sortedImages.length - 1);
     };
 
     return (
@@ -64,7 +67,7 @@ export default function ImageGallery({ images, className = "" }: ImageGalleryPro
                         }}
                     >
                         <div className="flex flex-col gap-2">
-                            {images.map((image, index) => (
+                            {sortedImages.map((image, index) => (
                                 <div 
                                     key={image.id} 
                                     className={`aspect-square rounded-md overflow-hidden transition-all duration-200 cursor-pointer ${
@@ -92,7 +95,7 @@ export default function ImageGallery({ images, className = "" }: ImageGalleryPro
             <ImageModal
                 isOpen={showModal}
                 onClose={() => setShowModal(false)}
-                images={images}
+                images={sortedImages}
                 currentIndex={selectedImageIndex}
                 onPrevious={prevImage}
                 onNext={nextImage}
