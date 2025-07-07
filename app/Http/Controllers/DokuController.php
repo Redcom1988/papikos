@@ -11,11 +11,6 @@ class DokuController extends Controller
 {
     protected $dokuService;
 
-    public function __construct(DokuTransactionService $dokuService)
-    {
-        $this->dokuService = $dokuService;
-    }
-
     /**
      * Show all transactions page
      */
@@ -236,7 +231,7 @@ class DokuController extends Controller
             return $date;
         }
     }
-    
+
     public function testApiConnection()
     {
         $result = $this->dokuService->testConnection();
