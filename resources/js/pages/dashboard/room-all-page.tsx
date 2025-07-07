@@ -19,9 +19,10 @@ import {
     MapPin,
     SquareIcon,
     Trash2,
-    Users
+    House
 } from "lucide-react";
 import { useState } from "react";
+import RoomImage from '@/components/ui/room-image';
 
 interface Room {
     id: number;
@@ -41,7 +42,18 @@ interface Room {
 }
 
 interface RoomAllPageProps {
-    rooms: Room[];
+    rooms: {
+        data: Room[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        links: Array<{
+            url: string | null;
+            label: string;
+            active: boolean;
+        }>;
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -53,7 +65,7 @@ export default function RoomAllPage({ rooms }: RoomAllPageProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [deletingRoom, setDeletingRoom] = useState<number | null>(null);
 
-    const filteredRooms = rooms.filter(room =>
+    const filteredRooms = rooms.data.filter(room =>
         room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         room.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
         room.owner_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -77,60 +89,22 @@ export default function RoomAllPage({ rooms }: RoomAllPageProps) {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">All Rooms</h1>
+                        <h1 className="text-3xl font-bold">Room Management</h1>
                         <p className="text-muted-foreground">
-                            Manage all room listings across the platform
+                            View and manage all room listings
                         </p>
                     </div>
-                </div>
-
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Rooms</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{rooms.length}</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Available</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-green-600">
-                                {rooms.filter(room => room.is_available).length}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Unavailable</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-red-600">
-                                {rooms.filter(room => !room.is_available).length}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Unique Owners</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-blue-600">
-                                {new Set(rooms.map(room => room.owner_email)).size}
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <div className="flex items-center gap-2">
+                        <House className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-sm font-medium">{rooms.total} Total Rooms</span>
+                    </div>
                 </div>
 
                 {/* Rooms Table */}
                 <Card>
                     <CardHeader>
                         <div className="flex items-center justify-between">
-                            <CardTitle>Rooms ({filteredRooms.length})</CardTitle>
+                            <CardTitle>All Rooms</CardTitle>
                             <div className="w-96">
                                 <SearchBar
                                     value={searchTerm}
@@ -142,119 +116,134 @@ export default function RoomAllPage({ rooms }: RoomAllPageProps) {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="overflow-x-auto">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Room</TableHead>
-                                        <TableHead>Owner</TableHead>
-                                        <TableHead>Location</TableHead>
-                                        <TableHead>Price</TableHead>
-                                        <TableHead>Details</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Created</TableHead>
-                                        <TableHead>Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {filteredRooms.map((room) => (
-                                        <TableRow key={room.id}>
-                                            <TableCell>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden">
-                                                        {room.primary_image ? (
-                                                            <img
-                                                                src={room.primary_image}
-                                                                alt={room.name}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full bg-muted" />
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-medium">{room.name}</div>
-                                                        <div className="text-sm text-muted-foreground">
-                                                            {room.images_count} images, {room.facilities_count} facilities
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Room</TableHead>
+                                    <TableHead>Owner</TableHead>
+                                    <TableHead>Location</TableHead>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Details</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Created</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredRooms.map((room) => (
+                                    <TableRow key={room.id}>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <RoomImage
+                                                    src={room.primary_image}
+                                                    alt={room.name}
+                                                    className="w-12 h-12 rounded-lg"
+                                                    objectFit="cover"
+                                                    loadingSize="sm"
+                                                />
                                                 <div>
-                                                    <div className="font-medium">{room.owner_name}</div>
-                                                    <div className="text-sm text-muted-foreground">{room.owner_email}</div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-1 max-w-48">
-                                                    <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                                                    <span className="text-sm truncate">{room.address}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="font-medium">{room.formatted_price}</div>
-                                                <div className="text-sm text-muted-foreground">/month</div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="space-y-1 text-sm">
-                                                    <div className="flex items-center gap-1">
-                                                        <SquareIcon className="w-3 h-3" />
-                                                        {room.size}m²
-                                                    </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <Users className="w-3 h-3" />
-                                                        {room.max_occupancy} people
+                                                    <div className="font-medium">{room.name}</div>
+                                                    <div className="text-sm text-muted-foreground">
+                                                        {room.images_count} images, {room.facilities_count} facilities
                                                     </div>
                                                 </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant={room.is_available ? "default" : "secondary"}>
-                                                    {room.is_available ? "Available" : "Unavailable"}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="text-sm">{room.created_at}</div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => window.open(`/rooms/${room.id}`, '_blank')}
-                                                    >
-                                                        <Eye className="w-3 h-3" />
-                                                    </Button>
-                                                    <Link href={`/dashboard/rooms/${room.id}/edit`}>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                        >
-                                                            <Edit className="w-3 h-3" />
-                                                        </Button>
-                                                    </Link>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleDelete(room.id)}
-                                                        disabled={deletingRoom === room.id}
-                                                        className="text-red-600 hover:text-red-700"
-                                                    >
-                                                        <Trash2 className="w-3 h-3" />
-                                                    </Button>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div>
+                                                <div className="font-medium">{room.owner_name}</div>
+                                                <div className="text-sm text-muted-foreground">{room.owner_email}</div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-1 max-w-48">
+                                                <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+                                                <span className="text-sm truncate">{room.address}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="font-medium">{room.formatted_price}</div>
+                                            <div className="text-sm text-muted-foreground">/month</div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="space-y-1 text-sm">
+                                                <div className="flex items-center gap-1">
+                                                    <SquareIcon className="w-3 h-3" />
+                                                    {room.size}m²
                                                 </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                        
-                        {filteredRooms.length === 0 && (
-                            <div className="text-center py-12">
-                                <div className="text-muted-foreground">
-                                    {searchTerm ? 'No rooms found matching your search.' : 'No rooms available.'}
+                                                <div className="flex items-center gap-1">
+                                                    <House className="w-3 h-3" />
+                                                    {room.max_occupancy} people
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant={room.is_available ? "default" : "destructive"}>
+                                                {room.is_available ? "Available" : "Unavailable"}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="text-sm">{room.created_at}</div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => window.open(`/rooms/${room.id}`, '_blank')}
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => router.visit(`/dashboard/rooms/${room.id}/edit`)}
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(room.id)}
+                                                    disabled={deletingRoom === room.id}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+
+                        {/* Pagination */}
+                        {rooms.last_page > 1 && (
+                            <div className="flex items-center justify-between px-2 py-4">
+                                <div className="text-sm text-muted-foreground">
+                                    Showing {((rooms.current_page - 1) * rooms.per_page) + 1} to {Math.min(rooms.current_page * rooms.per_page, rooms.total)} of {rooms.total} rooms
                                 </div>
+                                <div className="flex items-center gap-2">
+                                    {rooms.links.map((link, index) => (
+                                        <Button
+                                            key={index}
+                                            variant={link.active ? "default" : "outline"}
+                                            size="sm"
+                                            disabled={!link.url}
+                                            onClick={() => link.url && router.visit(link.url)}
+                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {filteredRooms.length === 0 && (
+                            <div className="text-center py-8">
+                                <House className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                                <h3 className="text-lg font-semibold mb-2">No Rooms Found</h3>
+                                <p className="text-muted-foreground">
+                                    {searchTerm ? 'No rooms found matching your search.' : 'No rooms available.'}
+                                </p>
                             </div>
                         )}
                     </CardContent>

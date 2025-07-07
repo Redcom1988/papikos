@@ -12,6 +12,7 @@ use App\Http\Controllers\Dashboard\MessageController as DashboardMessageControll
 use App\Http\Controllers\Dashboard\ReportController as DashboardReportController;
 use App\Http\Controllers\Dashboard\RoomController as DashboardRoomController;
 use App\Http\Controllers\Dashboard\AppointmentController as DashboardAppointmentController;
+use App\Http\Controllers\Dashboard\UserController as DashboardUserController;
 use Illuminate\Support\Facades\Route;
 
 // Home/Landing page
@@ -83,6 +84,13 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     Route::get('/rooms/{room}/edit', [DashboardRoomController::class, 'edit'])->name('dashboard.rooms.edit');
     Route::put('/rooms/{room}', [DashboardRoomController::class, 'update'])->name('dashboard.rooms.update');
     Route::delete('/rooms/{room}', [DashboardRoomController::class, 'destroy'])->name('dashboard.rooms.destroy');
+
+    // Dashboard users
+    Route::get('/users', [DashboardUserController::class, 'index'])->name('dashboard.users');
+    Route::get('/users/{user}/edit', [DashboardUserController::class, 'edit'])->name('dashboard.users.edit');
+    Route::put('/users/{user}', [DashboardUserController::class, 'update'])->name('dashboard.users.update');
+    Route::delete('/users/{user}', [DashboardUserController::class, 'destroy'])->name('dashboard.users.destroy');
+    Route::post('/users', [DashboardUserController::class, 'store'])->name('dashboard.users.store');
 });
 
 require __DIR__.'/auth.php';

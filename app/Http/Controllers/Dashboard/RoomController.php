@@ -67,25 +67,26 @@ class RoomController extends Controller
     {
         $rooms = Room::with(['images', 'facilities', 'owner'])
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($room) {
-                return [
-                    'id' => $room->id,
-                    'name' => $room->name,
-                    'address' => $room->address,
-                    'price' => $room->price,
-                    'formatted_price' => $room->formatted_price,
-                    'size' => $room->size,
-                    'max_occupancy' => $room->max_occupancy,
-                    'is_available' => $room->is_available,
-                    'owner_name' => $room->owner->name,
-                    'owner_email' => $room->owner->email,
-                    'facilities_count' => $room->facilities->count(),
-                    'images_count' => $room->images->count(),
-                    'primary_image' => $room->images->where('is_primary', true)->first()?->url,
-                    'created_at' => $room->created_at->format('M d, Y'),
-                ];
-            });
+            ->paginate(10);
+
+        $rooms->getCollection()->transform(function ($room) {
+            return [
+                'id' => $room->id,
+                'name' => $room->name,
+                'address' => $room->address,
+                'price' => $room->price,
+                'formatted_price' => $room->formatted_price,
+                'size' => $room->size,
+                'max_occupancy' => $room->max_occupancy,
+                'is_available' => $room->is_available,
+                'owner_name' => $room->owner->name,
+                'owner_email' => $room->owner->email,
+                'facilities_count' => $room->facilities->count(),
+                'images_count' => $room->images->count(),
+                'primary_image' => $room->images->where('is_primary', true)->first()?->url,
+                'created_at' => $room->created_at->format('M d, Y'),
+            ];
+        });
 
         return Inertia::render('dashboard/room-all-page', [
             'rooms' => $rooms
