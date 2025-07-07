@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ImageModal from './image-modal'; // Make sure this import path is correct
 
 interface ReportImageProps {
     src?: string | null;
@@ -21,6 +22,7 @@ export default function ReportImage({
 }: ReportImageProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     const handleLoad = () => {
         setIsLoading(false);
@@ -44,40 +46,61 @@ export default function ReportImage({
         };
     };
 
+    // Only show modal if image exists and loaded
+    const handleImageClick = () => {
+        if (src && !isLoading && !hasError) {
+            setShowModal(true);
+        }
+        if (onClick) onClick();
+    };
+
     return (
-        <div 
-            className={`relative overflow-hidden bg-muted ${onClick ? 'cursor-pointer' : ''} ${className}`}
-            onClick={onClick}
-        >
-            {/* Loading skeleton */}
-            {isLoading && (
-                <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center z-10">
-                    <div className={`${loadingSizes[loadingSize]} border-2 border-destructive border-t-transparent rounded-full animate-spin`}></div>
-                </div>
-            )}
-            
-            {/* Error fallback */}
-            {(hasError || !src) && !isLoading && (
-                <div className={`absolute inset-0 bg-gradient-to-r from-destructive to-orange-500 opacity-20 ${fallbackClassName}`}>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-muted-foreground text-xs">No evidence</span>
+        <>
+            <div 
+                className={`relative overflow-hidden bg-muted ${onClick ? 'cursor-pointer' : ''} ${className}`}
+                onClick={handleImageClick}
+            >
+                {/* Loading skeleton */}
+                {isLoading && (
+                    <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center z-10">
+                        <div className={`${loadingSizes[loadingSize]} border-2 border-destructive border-t-transparent rounded-full animate-spin`}></div>
                     </div>
-                </div>
-            )}
-            
-            {/* Actual image */}
-            {src && (
-                <img
-                    src={src}
-                    alt={alt}
-                    onLoad={handleLoad}
-                    onError={handleError}
-                    style={getObjectFitStyle()}
-                    className={`w-full h-full transition-all duration-300 ${
-                        isLoading ? 'opacity-0' : 'opacity-100'
-                    }`}
+                )}
+                
+                {/* Error fallback */}
+                {(hasError || !src) && !isLoading && (
+                    <div className={`absolute inset-0 bg-gradient-to-r from-destructive to-orange-500 opacity-20 ${fallbackClassName}`}>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-muted-foreground text-xs">No evidence</span>
+                        </div>
+                    </div>
+                )}
+                
+                {/* Actual image */}
+                {src && (
+                    <img
+                        src={src}
+                        alt={alt}
+                        onLoad={handleLoad}
+                        onError={handleError}
+                        style={getObjectFitStyle()}
+                        className={`w-full h-full transition-all duration-300 ${
+                            isLoading ? 'opacity-0' : 'opacity-100'
+                        }`}
+                    />
+                )}
+            </div>
+            {/* Image Modal */}
+            {src && showModal && (
+                <ImageModal
+                    isOpen={showModal}
+                    onClose={() => setShowModal(false)}
+                    images={[{ id: 1, url: src, caption: alt }]}
+                    currentIndex={0}
+                    onPrevious={() => {}}
+                    onNext={() => {}}
                 />
             )}
-        </div>
+        </>
     );
 }

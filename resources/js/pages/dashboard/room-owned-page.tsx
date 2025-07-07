@@ -6,17 +6,16 @@ import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from "@inertiajs/react";
 import {
-    DollarSign,
+    CheckCircle2,
     Edit,
+    Home,
     ImageIcon,
     MapPin,
     Plus,
     SquareIcon,
     Trash2,
     Users,
-    Home, 
-    CheckCircle2, 
-    XCircle 
+    XCircle
 } from "lucide-react";
 import { useState } from "react";
 
@@ -173,7 +172,6 @@ export default function RoomOwnedPage({ rooms }: RoomOwnedPageProps) {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-1 text-primary font-bold text-lg">
-                                            <DollarSign className="w-5 h-5" />
                                             <span>{room.formatted_price}</span>
                                         </div>
                                     </div>

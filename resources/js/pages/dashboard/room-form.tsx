@@ -23,6 +23,7 @@ import {
     X
 } from "lucide-react";
 import { useState } from "react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 interface Facility {
     id: number;
@@ -336,7 +337,7 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
                                 <div>
                                     <Label htmlFor="price" className="text-sm font-medium">Price per Month *</Label>
                                     <div className="relative">
-                                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground font-semibold">Rp</span>
                                         <Input
                                             id="price"
                                             type="number"
@@ -344,7 +345,7 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
                                             onChange={e => setData('price', Number(e.target.value))}
                                             placeholder="0"
                                             min="0"
-                                            step="0.01"
+                                            step="1"
                                             className={`pl-10 mt-1 border-gray-600 ${errors.price ? 'border-red-500' : ''}`}
                                         />
                                     </div>
@@ -456,13 +457,25 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="is_available"
-                                    checked={data.is_available}
-                                    onCheckedChange={(checked) => setData('is_available', checked as boolean)}
-                                />
-                                <Label htmlFor="is_available" className="text-sm font-medium">Room is available for booking</Label>
+                            <div>
+                                <Label htmlFor="is_available">Room Availability *</Label>
+                                <Select
+                                    value={data.is_available ? "available" : "unavailable"}
+                                    onValueChange={value => setData('is_available', value === "available")}
+                                >
+                                    <SelectTrigger
+                                        className={`mt-1 border-gray-600 ${errors.is_available ? 'border-red-500' : ''}`}
+                                    >
+                                        <SelectValue placeholder="Select availability" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="available">Available for booking</SelectItem>
+                                        <SelectItem value="unavailable">Not available</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                {errors.is_available && (
+                                    <p className="text-sm text-red-500 mt-1">{errors.is_available}</p>
+                                )}
                             </div>
                         </CardContent>
                     </Card>

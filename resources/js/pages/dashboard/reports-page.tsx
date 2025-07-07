@@ -16,6 +16,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { AlertCircle, CheckCircle, Clock, Image as ImageIcon, MapPin, MessageSquare, User, Calendar } from 'lucide-react';
 import { useState } from 'react';
+import ReportImage from '@/components/ui/report-image';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -207,12 +208,12 @@ export default function ReportsPage() {
                                         </div>
                                         <div className="flex gap-2 flex-wrap">
                                             {report.images.map((image) => (
-                                                <img
+                                                <ReportImage
                                                     key={image.id}
                                                     src={image.url}
                                                     alt="Report evidence"
                                                     className="w-20 h-20 object-cover rounded border cursor-pointer hover:scale-105 transition-transform"
-                                                    onClick={() => window.open(image.url, '_blank')}
+                                                    loadingSize="sm"
                                                 />
                                             ))}
                                         </div>
