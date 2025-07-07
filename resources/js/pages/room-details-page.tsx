@@ -210,7 +210,7 @@ export default function RoomDetailsPage() {
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div>
                         {/* Image Gallery */}
-                        <div className="mb-6 h-128 overflow-hidden">
+                        <div className="mb-6 h-144 overflow-hidden">
                             <ImageGallery images={room.images} className="h-full" />
                         </div>
                         

@@ -142,6 +142,7 @@ export default function RoomAllPage({ rooms }: RoomAllPageProps) {
                                                     className="w-12 h-12 rounded-lg"
                                                     objectFit="cover"
                                                     loadingSize="sm"
+                                                    enableModal
                                                 />
                                                 <div>
                                                     <div className="font-medium">{room.name}</div>

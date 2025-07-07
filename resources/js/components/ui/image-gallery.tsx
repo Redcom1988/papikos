@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import RoomImage from './room-image';
 import ImageModal from './image-modal';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ImageGalleryImage {
     id: number;
@@ -54,35 +55,36 @@ export default function ImageGallery({ images, className = "" }: ImageGalleryPro
                 </div>
                 
                 {/* Scrollable Thumbnail Column */}
-                <div className="w-20 flex flex-col gap-1">
-                    <div className="flex-1 overflow-y-auto min-h-0 space-y-1">
-                        {images.map((image, index) => (
-                            <div 
-                                key={image.id} 
-                                className={`aspect-square rounded-md overflow-hidden transition-all duration-200 cursor-pointer ${
-                                    selectedImageIndex === index 
-                                        ? 'ring-2 ring-primary opacity-100' 
-                                        : 'opacity-70 hover:opacity-100'
-                                }`}
-                            >
-                                <RoomImage
-                                    src={image.url}
-                                    alt={image.caption}
-                                    className="h-full"
-                                    objectFit="cover"
-                                    onClick={() => setSelectedImageIndex(index)}
-                                    loadingSize="sm"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                    
-                    {/* Show more indicator */}
-                    {images.length > 6 && (
-                        <div className="text-xs text-muted-foreground text-center py-1 bg-muted rounded-md">
-                            +{images.length - 6}
+                <div className="w-20 flex flex-col">
+                    <ScrollArea
+                        className="flex-1 overflow-y-auto min-h-0"
+                        style={{
+                            scrollbarWidth: "none", // Firefox
+                            msOverflowStyle: "none", // IE 10+
+                        }}
+                    >
+                        <div className="flex flex-col gap-2">
+                            {images.map((image, index) => (
+                                <div 
+                                    key={image.id} 
+                                    className={`aspect-square rounded-md overflow-hidden transition-all duration-200 cursor-pointer ${
+                                        selectedImageIndex === index 
+                                            ? 'ring-2 ring-primary opacity-100' 
+                                            : 'opacity-70 hover:opacity-100'
+                                    }`}
+                                >
+                                    <RoomImage
+                                        src={image.url}
+                                        alt={image.caption}
+                                        className="h-full"
+                                        objectFit="cover"
+                                        onClick={() => setSelectedImageIndex(index)}
+                                        loadingSize="sm"
+                                    />
+                                </div>
+                            ))}
                         </div>
-                    )}
+                    </ScrollArea>
                 </div>
             </div>
 
