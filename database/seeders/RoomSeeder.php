@@ -106,9 +106,32 @@ class RoomSeeder extends Seeder
                 $room->facilities()->attach($facilities);
 
                 // Add images
+                $unsplashImages = [
+                    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1503389152951-9c3d8b6e9c94?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1519974719765-e6559eac2575?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1512918728675-3d8017c8b6b4?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1512918728675-3d8017c8b6b4?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1465101178521-c1a9136a3b99?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1509395176047-4a66953fd231?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=800&q=80',
+                ];
+
                 RoomImage::create([
                     'room_id' => $room->id,
-                    'url' => 'https://picsum.photos/800/600?random=' . ($room->id * 10 + 1),
+                    'url' => $unsplashImages[array_rand($unsplashImages)],
                     'caption' => 'Main room view',
                     'is_primary' => true,
                 ]);
@@ -116,7 +139,7 @@ class RoomSeeder extends Seeder
                 for ($j = 2; $j <= rand(3, 6); $j++) {
                     RoomImage::create([
                         'room_id' => $room->id,
-                        'url' => 'https://picsum.photos/800/600?random=' . ($room->id * 10 + $j),
+                        'url' => $unsplashImages[array_rand($unsplashImages)],
                         'caption' => fake()->sentence(3),
                         'is_primary' => false,
                     ]);
