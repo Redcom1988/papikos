@@ -177,12 +177,14 @@ export default function ReportsStatusPage({ reports, filters }: ReportsStatusPag
                                     <TableRow key={report.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
-                                                <ReportImage
-                                                    src={report.images[0]?.url}
-                                                    alt="Report evidence"
-                                                    className="w-8 h-8 rounded"
-                                                    loadingSize="sm"
-                                                />
+                                                {report.images && report.images.length > 0 && (
+                                                    <ReportImage
+                                                        src={report.images[0].url}
+                                                        alt="Report evidence"
+                                                        className="w-8 h-8 rounded"
+                                                        loadingSize="sm"
+                                                    />
+                                                )}
                                                 <div>
                                                     <div className="font-medium capitalize">{report.type.replace('_', ' ')}</div>
                                                     <div className="text-sm text-muted-foreground truncate max-w-48">
