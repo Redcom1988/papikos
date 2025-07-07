@@ -275,7 +275,7 @@ export default function RoomDetailsPage() {
                                             className="hover:bg-muted/70 hover:border-border"
                                             size="ml"
                                         >
-                                            <Flag className="w-5 h-5 text-muted-foreground hover:text-red-600 dark:hover:text-red-400" />
+                                            <Flag className="transition-all duration-200 w-5 h-5 text-foreground hover:text-red-600 dark:hover:text-red-400" />
                                         </IconButton>
 
                                         <BookmarkButton

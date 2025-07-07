@@ -9,9 +9,11 @@ export default function Appearance() {
         <SettingsLayout>
             <Head title="Appearance Settings" />
 
-            <div className="space-y-6">
+            <div className="space-y-6 bg-background text-foreground">
                 <HeadingSmall title="Appearance settings" description="Update your account's appearance settings" />
-                <AppearanceTabs />
+                <div className="bg-background">
+                    <AppearanceTabs />
+                </div>
             </div>
         </SettingsLayout>
     );

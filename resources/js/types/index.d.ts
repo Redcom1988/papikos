@@ -92,7 +92,7 @@ export interface RoomDetails {
     images: RoomImage[];
     owner: Owner;
     facilities: Facility[];
-    reports?: Report[]; // Add this line
+    reports?: Report[]; 
 }
 
 export interface HeroRoom {

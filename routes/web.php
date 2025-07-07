@@ -11,8 +11,9 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Dashboard\MessageController as DashboardMessageController;
 use App\Http\Controllers\Dashboard\ReportController as DashboardReportController;
 use App\Http\Controllers\Dashboard\RoomController as DashboardRoomController;
+use App\Http\Controllers\Dashboard\AppointmentController as DashboardAppointmentController;
+use App\Http\Controllers\Dashboard\UserController as DashboardUserController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // Home/Landing page
 Route::get('/', [HomeController::class, 'index'])->name('landing.page');
@@ -60,14 +61,20 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     
     // Dashboard reports
     Route::get('/reports', [DashboardReportController::class, 'index'])->name('dashboard.reports');
-    Route::get('/reports-status', [DashboardReportController::class, 'admin'])->name('dashboard.reports.status');
+    Route::get('/reports-admin', [DashboardReportController::class, 'admin'])->name('dashboard.reports.admin');
     Route::post('/reports/{report}/respond', [DashboardReportController::class, 'respond'])->name('dashboard.reports.respond');
+    Route::patch('/reports/{report}/status', [DashboardReportController::class, 'updateStatus'])->name('dashboard.reports.updateStatus');
     
     // Dashboard messages
     Route::get('/messages', [DashboardMessageController::class, 'index'])->name('dashboard.messages');
     Route::get('/messages/users', [DashboardMessageController::class, 'getChatUsers']);
     Route::get('/messages/all-users', [DashboardMessageController::class, 'getAllUsers']);
     Route::get('/messages/{userId}', [DashboardMessageController::class, 'getMessages']);
+
+    // Owner appointment routes
+    Route::get('/appointments', [DashboardAppointmentController::class, 'index'])->name('dashboard.appointments');
+    Route::patch('/appointments/{appointment}/cancel', [DashboardAppointmentController::class, 'cancel'])->name('dashboard.appointments.cancel');
+    Route::patch('/appointments/{appointment}/complete', [DashboardAppointmentController::class, 'complete'])->name('dashboard.appointments.complete');
     
     // Dashboard rooms
     Route::get('/rooms-owned', [DashboardRoomController::class, 'index'])->name('dashboard.rooms.owned');
@@ -77,6 +84,13 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     Route::get('/rooms/{room}/edit', [DashboardRoomController::class, 'edit'])->name('dashboard.rooms.edit');
     Route::put('/rooms/{room}', [DashboardRoomController::class, 'update'])->name('dashboard.rooms.update');
     Route::delete('/rooms/{room}', [DashboardRoomController::class, 'destroy'])->name('dashboard.rooms.destroy');
+
+    // Dashboard users
+    Route::get('/users', [DashboardUserController::class, 'index'])->name('dashboard.users');
+    Route::get('/users/{user}/edit', [DashboardUserController::class, 'edit'])->name('dashboard.users.edit');
+    Route::put('/users/{user}', [DashboardUserController::class, 'update'])->name('dashboard.users.update');
+    Route::delete('/users/{user}', [DashboardUserController::class, 'destroy'])->name('dashboard.users.destroy');
+    Route::post('/users', [DashboardUserController::class, 'store'])->name('dashboard.users.store');
 });
 
 require __DIR__.'/auth.php';

@@ -89,4 +89,87 @@ class ReportController extends Controller
 
         return back()->with('success', 'Response submitted successfully.');
     }
+
+    public function admin(Request $request)
+    {
+        $user = $request->user();
+        
+        if (!$user || !$user->isAdmin()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $status = $request->get('status', 'all');
+        
+        $query = Report::with(['reporter', 'room.owner', 'images'])
+            ->orderBy('created_at', 'desc');
+
+        if ($status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        $reports = $query->paginate(12);
+
+        $reports->getCollection()->transform(function ($report) {
+            return [
+                'id' => $report->id,
+                'type' => $report->type,
+                'description' => $report->description,
+                'status' => $report->status,
+                'admin_notes' => $report->admin_notes,
+                'owner_response' => $report->owner_response,
+                'owner_response_action' => $report->owner_response_action,
+                'owner_responded_at' => $report->owner_responded_at?->format('M d, Y H:i'),
+                'created_at' => $report->created_at->format('M d, Y H:i'),
+                'reporter' => [
+                    'id' => $report->reporter->id,
+                    'name' => $report->reporter->name,
+                    'email' => $report->reporter->email,
+                ],
+                'room' => [
+                    'id' => $report->room->id,
+                    'name' => $report->room->name,
+                    'address' => $report->room->address,
+                ],
+                'owner' => [
+                    'id' => $report->room->owner->id,
+                    'name' => $report->room->owner->name,
+                    'email' => $report->room->owner->email,
+                ],
+                'images' => $report->images->map(function ($image) {
+                    return [
+                        'id' => $image->id,
+                        'url' => $image->url,
+                    ];
+                })->toArray(),
+            ];
+        });
+
+        return Inertia::render('dashboard/reports-admin-page', [
+            'reports' => $reports,
+            'filters' => [
+                'status' => $status
+            ]
+        ]);
+    }
+
+    public function updateStatus(Request $request, Report $report)
+    {
+        $user = $request->user();
+        
+        if (!$user || !$user->isAdmin()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $request->validate([
+            'status' => 'required|in:pending,investigating,resolved,dismissed',
+            'admin_notes' => 'nullable|string|max:1000',
+        ]);
+
+        $report->update([
+            'status' => $request->status,
+            'admin_notes' => $request->admin_notes,
+        ]);
+
+        return back()->with('success', 'Report updated successfully.');
+    }
 }
