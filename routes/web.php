@@ -52,7 +52,6 @@ Route::middleware('auth')->group(function () {
     
     // Message fetching route (used by both dashboard and mobile chat)
     Route::get('/messages/{userId}', [DashboardMessageController::class, 'getMessages'])->name('messages.get');
-
 });
 
 // Dashboard routes
@@ -72,7 +71,7 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     Route::get('/messages/all-users', [DashboardMessageController::class, 'getAllUsers']);
     Route::get('/messages/{userId}', [DashboardMessageController::class, 'getMessages']);
 
-        // Owner appointment routes
+    // Owner appointment routes
     Route::get('/appointments', [DashboardAppointmentController::class, 'index'])->name('dashboard.appointments');
     Route::patch('/appointments/{appointment}/cancel', [DashboardAppointmentController::class, 'cancel'])->name('dashboard.appointments.cancel');
     Route::patch('/appointments/{appointment}/complete', [DashboardAppointmentController::class, 'complete'])->name('dashboard.appointments.complete');
