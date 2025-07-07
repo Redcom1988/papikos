@@ -62,8 +62,9 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     
     // Dashboard reports
     Route::get('/reports', [DashboardReportController::class, 'index'])->name('dashboard.reports');
-    Route::get('/reports-status', [DashboardReportController::class, 'admin'])->name('dashboard.reports.status');
+    Route::get('/reports-admin', [DashboardReportController::class, 'admin'])->name('dashboard.reports.admin');
     Route::post('/reports/{report}/respond', [DashboardReportController::class, 'respond'])->name('dashboard.reports.respond');
+    Route::patch('/reports/{report}/status', [DashboardReportController::class, 'updateStatus'])->name('dashboard.reports.updateStatus');
     
     // Dashboard messages
     Route::get('/messages', [DashboardMessageController::class, 'index'])->name('dashboard.messages');

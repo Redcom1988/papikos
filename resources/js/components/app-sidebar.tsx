@@ -76,8 +76,8 @@ export function AppSidebar() {
                     icon: Home,
                 },
                 {
-                    title: 'Reports',
-                    href: '/dashboard/reports-status',
+                    title: 'Manage Reports',
+                    href: '/dashboard/reports-admin',
                     icon: Flag,
                 },
                 {
