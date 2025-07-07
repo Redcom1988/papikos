@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
-import { Send, MessageCircle, Loader2, X, Minimize2 } from 'lucide-react';
+import { Send, MessageCircle, Loader2, X } from 'lucide-react';
 import { usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +32,6 @@ export interface MobileChatRef {
 
 const MobileChat = forwardRef<MobileChatRef, MobileChatProps>(({ className = '' }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [isMinimized, setIsMinimized] = useState(false);
     const [users, setUsers] = useState<User[]>([]);
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -150,18 +149,16 @@ const MobileChat = forwardRef<MobileChatRef, MobileChatProps>(({ className = '' 
     }, [selectedUser]);
 
     useEffect(() => {
-        if (isOpen && !isMinimized && users.length === 0) {
+        if (isOpen && users.length === 0) {
             fetchUsers();
         }
-    }, [isOpen, isMinimized]);
+    }, [isOpen]);
 
     // Expose methods to parent components
     useImperativeHandle(ref, () => ({
         openChatWithUser: (user: User) => {
             setIsOpen(true);
-            setIsMinimized(false);
             setSelectedUser(user);
-            // Add user to users list if not already there
             setUsers(prev => {
                 const userExists = prev.some(u => u.id === user.id);
                 if (!userExists) {
@@ -194,11 +191,7 @@ const MobileChat = forwardRef<MobileChatRef, MobileChatProps>(({ className = '' 
             {/* Chat Window */}
             {isOpen && (
                 <div className={`fixed inset-x-4 bottom-4 sm:inset-x-auto sm:bottom-4 sm:right-4 sm:w-80 lg:w-96 lg:bottom-6 lg:right-6 z-50 ${className}`}>
-                    <div className={`bg-background border border-border rounded-lg shadow-xl transition-all duration-200 ${
-                        isMinimized 
-                            ? 'h-12 sm:h-14' 
-                            : 'h-[70vh] sm:h-96 lg:h-[500px] max-h-[600px]'
-                    }`}>
+                    <div className={`bg-background border border-border rounded-lg shadow-xl transition-all duration-200 h-[70vh] sm:h-96 lg:h-[500px] max-h-[600px]`}>
                         {/* Header */}
                         <div className="flex items-center justify-between p-2 sm:p-3 border-b border-border bg-muted/50 rounded-t-lg">
                             <div className="flex items-center gap-2">
@@ -211,17 +204,8 @@ const MobileChat = forwardRef<MobileChatRef, MobileChatProps>(({ className = '' 
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    onClick={() => setIsMinimized(!isMinimized)}
-                                    className="w-6 h-6 sm:w-7 sm:h-7"
-                                >
-                                    <Minimize2 className="w-3 h-3" />
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
                                     onClick={() => {
                                         setIsOpen(false);
-                                        setIsMinimized(false);
                                         setSelectedUser(null);
                                     }}
                                     className="w-6 h-6 sm:w-7 sm:h-7"
@@ -232,144 +216,142 @@ const MobileChat = forwardRef<MobileChatRef, MobileChatProps>(({ className = '' 
                         </div>
 
                         {/* Content */}
-                        {!isMinimized && (
-                            <>
-                                {!selectedUser ? (
-                                    /* Users List */
-                                    <div className="flex flex-col h-[calc(100%-3rem)]">
-                                        <div className="p-2 sm:p-3 border-b border-border">
-                                            <h3 className="text-xs sm:text-sm font-medium">Recent Chats</h3>
-                                        </div>
-                                        <ScrollArea className="flex-1">
-                                            {isLoadingUsers ? (
+                        <>
+                            {!selectedUser ? (
+                                /* Users List */
+                                <div className="flex flex-col h-[calc(100%-3rem)]">
+                                    <div className="p-2 sm:p-3 border-b border-border">
+                                        <h3 className="text-xs sm:text-sm font-medium">Recent Chats</h3>
+                                    </div>
+                                    <ScrollArea className="flex-1">
+                                        {isLoadingUsers ? (
+                                            <div className="flex items-center justify-center h-32">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            </div>
+                                        ) : users.length > 0 ? (
+                                            <div className="p-2 space-y-1">
+                                                {users.map((user) => (
+                                                    <Button
+                                                        key={user.id}
+                                                        variant="ghost"
+                                                        className="w-full justify-start text-left h-auto p-2 sm:p-3"
+                                                        onClick={() => setSelectedUser(user)}
+                                                    >
+                                                        <div>
+                                                            <div className="font-medium text-xs sm:text-sm">{user.name}</div>
+                                                            <div className="text-xs text-muted-foreground">Click to chat</div>
+                                                        </div>
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-center h-32 text-muted-foreground text-xs sm:text-sm">
+                                                No conversations yet
+                                            </div>
+                                        )}
+                                    </ScrollArea>
+                                </div>
+                            ) : (
+                                /* Chat Interface */
+                                <div className="flex flex-col h-[calc(100%-3rem)]">
+                                    {/* Back Button */}
+                                    <div className="p-2 border-b border-border">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setSelectedUser(null)}
+                                            className="text-xs"
+                                        >
+                                            ← Back to chats
+                                        </Button>
+                                    </div>
+
+                                    {/* Messages - takes available space but leaves room for input */}
+                                    <div className="flex-1 min-h-0">
+                                        <ScrollArea className="h-full p-2 sm:p-3">
+                                            {isLoadingMessages ? (
                                                 <div className="flex items-center justify-center h-32">
                                                     <Loader2 className="w-4 h-4 animate-spin" />
                                                 </div>
-                                            ) : users.length > 0 ? (
-                                                <div className="p-2 space-y-1">
-                                                    {users.map((user) => (
-                                                        <Button
-                                                            key={user.id}
-                                                            variant="ghost"
-                                                            className="w-full justify-start text-left h-auto p-2 sm:p-3"
-                                                            onClick={() => setSelectedUser(user)}
-                                                        >
-                                                            <div>
-                                                                <div className="font-medium text-xs sm:text-sm">{user.name}</div>
-                                                                <div className="text-xs text-muted-foreground">Click to chat</div>
-                                                            </div>
-                                                        </Button>
-                                                    ))}
-                                                </div>
                                             ) : (
-                                                <div className="flex items-center justify-center h-32 text-muted-foreground text-xs sm:text-sm">
-                                                    No conversations yet
+                                                <div className="space-y-2">
+                                                    {messages.length === 0 ? (
+                                                        <div className="text-center text-muted-foreground text-xs sm:text-sm p-4">
+                                                            No messages yet. Start the conversation!
+                                                        </div>
+                                                    ) : (
+                                                        messages.map((message) => (
+                                                            <div
+                                                                key={message.id}
+                                                                className={`flex ${
+                                                                    message.sender === auth.user.id ? 'justify-end' : 'justify-start'
+                                                                }`}
+                                                            >
+                                                                <div
+                                                                    className={`max-w-[85%] sm:max-w-[80%] px-2 py-1 sm:px-3 sm:py-2 rounded-lg text-xs ${
+                                                                        message.sender === auth.user.id
+                                                                            ? 'bg-primary text-primary-foreground'
+                                                                            : 'bg-muted'
+                                                                    } ${
+                                                                        // Add subtle opacity for optimistic messages
+                                                                        message.id > 1000000000000 ? 'opacity-80' : ''
+                                                                    }`}
+                                                                >
+                                                                    <p className="break-words">{message.message}</p>
+                                                                    <div className="flex items-center justify-between mt-1">
+                                                                        <p className="text-xs opacity-70">
+                                                                            {new Date(message.created_at).toLocaleTimeString([], {
+                                                                                hour: '2-digit',
+                                                                                minute: '2-digit'
+                                                                            })}
+                                                                        </p>
+                                                                        {/* Show sending indicator for optimistic messages */}
+                                                                        {message.sender === auth.user.id && message.id > 1000000000000 && isSending && (
+                                                                            <Loader2 className="w-3 h-3 animate-spin opacity-60 ml-1" />
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    )}
+                                                    <div ref={messagesEndRef} />
                                                 </div>
                                             )}
                                         </ScrollArea>
                                     </div>
-                                ) : (
-                                    /* Chat Interface */
-                                    <div className="flex flex-col h-[calc(100%-3rem)]">
-                                        {/* Back Button */}
-                                        <div className="p-2 border-b border-border">
+
+                                    {/* Input - always visible at bottom */}
+                                    <div className="flex-shrink-0 p-2 sm:p-3 border-t border-border bg-background">
+                                        <div className="flex items-center gap-2">
+                                            <Input
+                                                value={inputValue}
+                                                onChange={(e) => setInputValue(e.target.value)}
+                                                placeholder="Type a message..."
+                                                className="text-xs h-8 sm:h-9"
+                                                disabled={isLoadingMessages}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && inputValue.trim() && !isSending && !isLoadingMessages) {
+                                                        handleSendMessage(selectedUser.id);
+                                                    }
+                                                }}
+                                            />
                                             <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setSelectedUser(null)}
-                                                className="text-xs"
+                                                onClick={() => handleSendMessage(selectedUser.id)}
+                                                disabled={isSending || inputValue.trim() === '' || isLoadingMessages}
+                                                size="icon"
+                                                className="w-8 h-8 sm:w-9 sm:h-9"
                                             >
-                                                ← Back to chats
+                                                {isSending ? (
+                                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                                ) : (
+                                                    <Send className="w-3 h-3" />
+                                                )}
                                             </Button>
                                         </div>
-
-                                        {/* Messages - takes available space but leaves room for input */}
-                                        <div className="flex-1 min-h-0">
-                                            <ScrollArea className="h-full p-2 sm:p-3">
-                                                {isLoadingMessages ? (
-                                                    <div className="flex items-center justify-center h-32">
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                                    </div>
-                                                ) : (
-                                                    <div className="space-y-2">
-                                                        {messages.length === 0 ? (
-                                                            <div className="text-center text-muted-foreground text-xs sm:text-sm p-4">
-                                                                No messages yet. Start the conversation!
-                                                            </div>
-                                                        ) : (
-                                                            messages.map((message) => (
-                                                                <div
-                                                                    key={message.id}
-                                                                    className={`flex ${
-                                                                        message.sender === auth.user.id ? 'justify-end' : 'justify-start'
-                                                                    }`}
-                                                                >
-                                                                    <div
-                                                                        className={`max-w-[85%] sm:max-w-[80%] px-2 py-1 sm:px-3 sm:py-2 rounded-lg text-xs ${
-                                                                            message.sender === auth.user.id
-                                                                                ? 'bg-primary text-primary-foreground'
-                                                                                : 'bg-muted'
-                                                                        } ${
-                                                                            // Add subtle opacity for optimistic messages
-                                                                            message.id > 1000000000000 ? 'opacity-80' : ''
-                                                                        }`}
-                                                                    >
-                                                                        <p className="break-words">{message.message}</p>
-                                                                        <div className="flex items-center justify-between mt-1">
-                                                                            <p className="text-xs opacity-70">
-                                                                                {new Date(message.created_at).toLocaleTimeString([], {
-                                                                                    hour: '2-digit',
-                                                                                    minute: '2-digit'
-                                                                                })}
-                                                                            </p>
-                                                                            {/* Show sending indicator for optimistic messages */}
-                                                                            {message.sender === auth.user.id && message.id > 1000000000000 && isSending && (
-                                                                                <Loader2 className="w-3 h-3 animate-spin opacity-60 ml-1" />
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            ))
-                                                        )}
-                                                        <div ref={messagesEndRef} />
-                                                    </div>
-                                                )}
-                                            </ScrollArea>
-                                        </div>
-
-                                        {/* Input - always visible at bottom */}
-                                        <div className="flex-shrink-0 p-2 sm:p-3 border-t border-border bg-background">
-                                            <div className="flex items-center gap-2">
-                                                <Input
-                                                    value={inputValue}
-                                                    onChange={(e) => setInputValue(e.target.value)}
-                                                    placeholder="Type a message..."
-                                                    className="text-xs h-8 sm:h-9"
-                                                    disabled={isLoadingMessages}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter' && inputValue.trim() && !isSending && !isLoadingMessages) {
-                                                            handleSendMessage(selectedUser.id);
-                                                        }
-                                                    }}
-                                                />
-                                                <Button
-                                                    onClick={() => handleSendMessage(selectedUser.id)}
-                                                    disabled={isSending || inputValue.trim() === '' || isLoadingMessages}
-                                                    size="icon"
-                                                    className="w-8 h-8 sm:w-9 sm:h-9"
-                                                >
-                                                    {isSending ? (
-                                                        <Loader2 className="w-3 h-3 animate-spin" />
-                                                    ) : (
-                                                        <Send className="w-3 h-3" />
-                                                    )}
-                                                </Button>
-                                            </div>
-                                        </div>
                                     </div>
-                                )}
-                            </>
-                        )}
+                                </div>
+                            )}
+                        </>
                     </div>
                 </div>
             )}
