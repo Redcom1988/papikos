@@ -34,50 +34,84 @@ class MessageSeeder extends Seeder
             'Are pets allowed?',
             'Is internet included?',
             'Can I visit this weekend?',
+            'Is there a curfew?',
+            'How many people can stay in the room?',
+            'Is there a kitchen I can use?',
+            'Are guests allowed to stay overnight?',
+            'How do I pay the rent each month?',
+            'Is there a minimum stay period?',
+            'Can I move in next month?',
+            'Is there a contract to sign?',
+            'Are there any additional fees?',
+            'Can I bring my own furniture?',
         ];
 
-        // Create 50 random messages
-        for ($i = 0; $i < 50; $i++) {
+        // Create 80 random messages
+        for ($i = 0; $i < 80; $i++) {
             $sender = $users->random();
             $receiver = $users->where('id', '!=', $sender->id)->random();
-            
+
             Message::create([
                 'sender' => $sender->id,
                 'receiver' => $receiver->id,
                 'message' => $sampleMessages[array_rand($sampleMessages)],
-                'created_at' => Carbon::now()->subDays(rand(0, 30)),
-                'updated_at' => Carbon::now()->subDays(rand(0, 30)),
+                'created_at' => Carbon::now()->subDays(rand(0, 30))->addMinutes(rand(0, 1440)),
+                'updated_at' => Carbon::now()->subDays(rand(0, 30))->addMinutes(rand(0, 1440)),
             ]);
         }
 
-        // Create some conversation threads between specific users
-        $owner = User::where('email', 'admin@example.com')->first();
-        $renter = User::where('email', 'renter@example.com')->first();
+        // Create more realistic conversation threads
+        $owners = User::where('role', 'owner')->get();
+        $renters = User::where('role', 'renter')->get();
 
-        if ($owner && $renter) {
-            // Conversation thread
-            $conversationMessages = [
-                ['sender' => $renter->id, 'message' => 'Hi, I saw your room listing and I\'m very interested!'],
-                ['sender' => $owner->id, 'message' => 'Hello! Thank you for your interest. Which room are you looking at?'],
-                ['sender' => $renter->id, 'message' => 'The one-bedroom apartment downtown. Is it still available?'],
-                ['sender' => $owner->id, 'message' => 'Yes, it\'s still available. Would you like to schedule a viewing?'],
-                ['sender' => $renter->id, 'message' => 'That would be great! When are you available?'],
-                ['sender' => $owner->id, 'message' => 'I\'m free this weekend. How about Saturday at 2 PM?'],
-                ['sender' => $renter->id, 'message' => 'Perfect! I\'ll see you then. What\'s the exact address?'],
-            ];
-
-            $baseTime = Carbon::now()->subDays(5);
-            foreach ($conversationMessages as $index => $msgData) {
-                Message::create([
-                    'sender' => $msgData['sender'],
-                    'receiver' => $msgData['sender'] == $owner->id ? $renter->id : $owner->id,
-                    'message' => $msgData['message'],
-                    'created_at' => $baseTime->copy()->addHours($index * 2),
-                    'updated_at' => $baseTime->copy()->addHours($index * 2),
-                ]);
+        foreach ($owners as $owner) {
+            foreach ($renters->random(min(2, $renters->count())) as $renter) {
+                $baseTime = Carbon::now()->subDays(rand(1, 10));
+                $thread = [
+                    ['sender' => $renter->id, 'message' => 'Hi, I\'m interested in your kos. Is it still available?'],
+                    ['sender' => $owner->id, 'message' => 'Yes, it\'s still available. Would you like to schedule a viewing?'],
+                    ['sender' => $renter->id, 'message' => 'Yes, can I come this Saturday?'],
+                    ['sender' => $owner->id, 'message' => 'Saturday works. See you at 10 AM!'],
+                    ['sender' => $renter->id, 'message' => 'Thank you! Looking forward to it.'],
+                ];
+                foreach ($thread as $idx => $msg) {
+                    Message::create([
+                        'sender' => $msg['sender'],
+                        'receiver' => $msg['sender'] == $owner->id ? $renter->id : $owner->id,
+                        'message' => $msg['message'],
+                        'created_at' => $baseTime->copy()->addMinutes($idx * 30),
+                        'updated_at' => $baseTime->copy()->addMinutes($idx * 30),
+                    ]);
+                }
             }
         }
 
-        $this->command->info('Messages seeded successfully!');
+        // Create some already existing conversations between specific users
+        $userPairs = [
+            // [sender_id, receiver_id]
+            [$users[0]->id, $users[1]->id],
+            [$users[1]->id, $users[0]->id],
+            [$users[2]->id ?? $users[0]->id, $users[3]->id ?? $users[1]->id],
+        ];
+
+        foreach ($userPairs as $pair) {
+            $baseTime = Carbon::now()->subDays(rand(5, 20));
+            $conversation = [
+                ['sender' => $pair[0], 'receiver' => $pair[1], 'message' => 'Hey, are you still looking for a room?'],
+                ['sender' => $pair[1], 'receiver' => $pair[0], 'message' => 'Yes, I am! Do you have any available?'],
+                ['sender' => $pair[0], 'receiver' => $pair[1], 'message' => 'I have one available starting next week.'],
+                ['sender' => $pair[1], 'receiver' => $pair[0], 'message' => 'Great! Can I visit this Friday?'],
+                ['sender' => $pair[0], 'receiver' => $pair[1], 'message' => 'Sure, see you then!'],
+            ];
+            foreach ($conversation as $idx => $msg) {
+                Message::create([
+                    'sender' => $msg['sender'],
+                    'receiver' => $msg['receiver'],
+                    'message' => $msg['message'],
+                    'created_at' => $baseTime->copy()->addMinutes($idx * 25),
+                    'updated_at' => $baseTime->copy()->addMinutes($idx * 25),
+                ]);
+            }
+        }
     }
 }
