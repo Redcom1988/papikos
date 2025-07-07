@@ -77,12 +77,12 @@ export default function OwnerAppointmentsPage({ appointments }: OwnerAppointment
         }
     };
 
-    const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    const getStatusVariant = (status: string): "default" | "warning" | "destructive" | "outline" => {
         switch (status) {
             case 'scheduled':
-                return "default";
+                return "warning";
             case 'completed':
-                return "secondary";
+                return "default";
             case 'cancelled':
                 return "destructive";
             default:
@@ -141,8 +141,8 @@ export default function OwnerAppointmentsPage({ appointments }: OwnerAppointment
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <Card className="py-0">
                         <CardContent className="p-6">
-                            <div className="flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-blue-500" />
+                            <div className="flex items-center gap-4">
+                                <Calendar className="w-8 h-8 text-gray-500" />
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Total</p>
                                     <p className="text-2xl font-bold">{appointments.length}</p>
@@ -152,8 +152,8 @@ export default function OwnerAppointmentsPage({ appointments }: OwnerAppointment
                     </Card>
                     <Card className="py-0">
                         <CardContent className="p-6">
-                            <div className="flex items-center gap-2">
-                                <Clock className="w-5 h-5 text-orange-500" />
+                            <div className="flex items-center gap-4">
+                                <Clock className="w-8 h-8 text-orange-500" />
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Upcoming</p>
                                     <p className="text-2xl font-bold">{upcomingAppointments.length}</p>
@@ -163,8 +163,8 @@ export default function OwnerAppointmentsPage({ appointments }: OwnerAppointment
                     </Card>
                     <Card className="py-0">
                         <CardContent className="p-6">
-                            <div className="flex items-center gap-2">
-                                <CheckCircle className="w-5 h-5 text-green-500" />
+                            <div className="flex items-center gap-4">
+                                <CheckCircle className="w-8 h-8 text-blue-500" />
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Completed</p>
                                     <p className="text-2xl font-bold">
@@ -176,8 +176,8 @@ export default function OwnerAppointmentsPage({ appointments }: OwnerAppointment
                     </Card>
                     <Card className="py-0">
                         <CardContent className="p-6">
-                            <div className="flex items-center gap-2">
-                                <XCircle className="w-5 h-5 text-red-500" />
+                            <div className="flex items-center gap-4">
+                                <XCircle className="w-8 h-8 text-red-500" />
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Cancelled</p>
                                     <p className="text-2xl font-bold">
@@ -244,7 +244,7 @@ export default function OwnerAppointmentsPage({ appointments }: OwnerAppointment
                                                         </div>
                                                         <Badge 
                                                             variant={getStatusVariant(appointment.status)}
-                                                            className="flex items-center gap-1 flex-shrink-0"
+                                                            className="flex items-center gap-1 flex-shrink-0 min-h-[2rem]"
                                                         >
                                                             {getStatusIcon(appointment.status)}
                                                             <span className="capitalize">{appointment.status}</span>

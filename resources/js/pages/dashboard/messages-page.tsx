@@ -125,7 +125,7 @@ export default function Messages({ users }: MessagesProps) {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">Messages</h1>
+                        <h1 className="text-3xl font-bold">Messages</h1>
                         <p className="text-muted-foreground">
                             Communicate with tenants and inquirers
                         </p>

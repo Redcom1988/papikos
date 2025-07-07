@@ -8,7 +8,6 @@ use App\Models\Appointment;
 use App\Models\User;
 use App\Models\Report;
 use App\Enums\UserRole;
-use App\Models\Message;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -125,7 +124,7 @@ class DashboardController extends Controller
                 'total_rooms' => $rooms->count(),
                 'available_rooms' => $rooms->where('is_available', true)->count(),
                 'occupied_rooms' => $rooms->where('is_available', false)->count(),
-                'pending_appointments' => $appointments->where('status', 'scheduled')->count(),
+                'upcoming_appointments' => $appointments->where('status', 'scheduled')->count(),
             ],
             'appointments' => $appointments,
         ]);
