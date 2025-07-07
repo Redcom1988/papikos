@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Facility extends Model
 {
-    protected $fillable = ['name', 'description', 'icon'];
+    protected $fillable = ['name', 'description'];
 
     public function rooms(): BelongsToMany
     {
