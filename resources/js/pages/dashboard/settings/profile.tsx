@@ -13,6 +13,7 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Dashboard', href: '/dashboard' },
     {
         title: 'Profile settings',
         href: '/dashboard/settings/profile',

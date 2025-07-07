@@ -19,7 +19,9 @@ import {
     MapPin,
     SquareIcon,
     Trash2,
-    House
+    House,
+    Calendar,
+    Users
 } from "lucide-react";
 import { useState } from "react";
 import RoomImage from '@/components/ui/room-image';
@@ -150,28 +152,30 @@ export default function RoomAllPage({ rooms }: RoomAllPageProps) {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div>
-                                                <div className="font-medium">{room.owner_name}</div>
-                                                <div className="text-sm text-muted-foreground">{room.owner_email}</div>
+                                            <div className="flex items-center gap-2">
+                                                <Users className="w-4 h-4 text-muted-foreground" />
+                                                <div>
+                                                    <div className="font-medium">{room.owner_name}</div>
+                                                    <div className="text-sm text-muted-foreground">{room.owner_email}</div>
+                                                </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-1 max-w-48">
+                                            <div className="flex items-center gap-2 max-w-48">
                                                 <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                                                 <span className="text-sm truncate">{room.address}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="font-medium">{room.formatted_price}</div>
-                                            <div className="text-sm text-muted-foreground">/month</div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="space-y-1 text-sm">
-                                                <div className="flex items-center gap-1">
+                                                <div className="flex items-center gap-2">
                                                     <SquareIcon className="w-3 h-3" />
                                                     {room.size}m²
                                                 </div>
-                                                <div className="flex items-center gap-1">
+                                                <div className="flex items-center gap-2">
                                                     <House className="w-3 h-3" />
                                                     {room.max_occupancy} people
                                                 </div>
@@ -183,7 +187,10 @@ export default function RoomAllPage({ rooms }: RoomAllPageProps) {
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="text-sm">{room.created_at}</div>
+                                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                                                <Calendar className="w-4 h-4" />
+                                                {room.created_at}
+                                            </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center justify-end gap-2">

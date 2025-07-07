@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Head, router, useForm } from '@inertiajs/react';
-import { AlertTriangle, Clock, CheckCircle, XCircle, Eye, Filter, Save } from 'lucide-react';
+import { AlertTriangle, Clock, CheckCircle, XCircle, Eye, Filter, Save, Users, House, Calendar } from 'lucide-react';
 import { useState } from 'react';
+import ReportImage from '@/components/ui/report-image';
 
 interface Report {
     id: number;
@@ -29,6 +30,7 @@ interface Report {
         id: number;
         name: string;
         address: string;
+        primary_image?: string;
     };
     owner: {
         id: number;
@@ -68,7 +70,7 @@ export default function ReportsStatusPage({ reports, filters }: ReportsStatusPag
         admin_notes: '',
     });
 
-    const getStatusBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+    const getStatusBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" | 'warning' => {
         switch (status) {
             case 'resolved':
                 return "default";
@@ -76,6 +78,8 @@ export default function ReportsStatusPage({ reports, filters }: ReportsStatusPag
                 return "secondary";
             case 'dismissed':
                 return "destructive";
+            case 'pending':
+                return "warning";
             default:
                 return "outline";
         }
@@ -155,7 +159,7 @@ export default function ReportsStatusPage({ reports, filters }: ReportsStatusPag
                             <div className="flex items-center gap-2">
                                 <Filter className="w-4 h-4 text-muted-foreground" />
                                 <Select value={filters.status} onValueChange={handleFilterChange}>
-                                    <SelectTrigger className="w-48">
+                                    <SelectTrigger className="w-48 h-10">
                                         <SelectValue placeholder="Filter by status" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -185,23 +189,37 @@ export default function ReportsStatusPage({ reports, filters }: ReportsStatusPag
                                 {reports.data.map((report) => (
                                     <TableRow key={report.id}>
                                         <TableCell>
-                                            <div>
-                                                <div className="font-medium capitalize">{report.type.replace('_', ' ')}</div>
-                                                <div className="text-sm text-muted-foreground truncate max-w-48">
-                                                    {report.description}
+                                            <div className="flex items-center gap-2">
+                                                <ReportImage
+                                                    src={report.images[0]?.url}
+                                                    alt="Report evidence"
+                                                    className="w-8 h-8 rounded"
+                                                    loadingSize="sm"
+                                                />
+                                                <div>
+                                                    <div className="font-medium capitalize">{report.type.replace('_', ' ')}</div>
+                                                    <div className="text-sm text-muted-foreground truncate max-w-48">
+                                                        {report.description}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div>
-                                                <div className="font-medium truncate max-w-32">{report.room.name}</div>
-                                                <div className="text-sm text-muted-foreground truncate max-w-32">
-                                                    {report.room.address}
+                                            <div className="flex items-center gap-2">
+                                                <House className="w-4 h-4 text-muted-foreground" />
+                                                <div>
+                                                    <div className="font-medium truncate max-w-32">{report.room.name}</div>
+                                                    <div className="text-sm text-muted-foreground truncate max-w-32">
+                                                        {report.room.address}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="font-medium">{report.reporter.name}</div>
+                                            <div className="font-medium flex items-center gap-2">
+                                                <Users className="w-4 h-4 text-muted-foreground" />
+                                                {report.reporter.name}
+                                            </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
@@ -211,8 +229,11 @@ export default function ReportsStatusPage({ reports, filters }: ReportsStatusPag
                                                 </Badge>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground text-sm">
-                                            {report.created_at}
+                                        <TableCell>
+                                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                                                <Calendar className="w-4 h-4" />
+                                                {report.created_at}
+                                            </div>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <Button

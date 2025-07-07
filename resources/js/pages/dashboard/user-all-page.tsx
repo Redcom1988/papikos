@@ -1,26 +1,23 @@
-import AppLayout from '@/layouts/app-layout';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableHead, 
-    TableHeader, 
-    TableRow 
-} from '@/components/ui/table';
-import { Head } from '@inertiajs/react';
-import { Users, CheckCircle, XCircle, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { router } from '@inertiajs/react';
-import { Edit, Trash2, Plus, Save } from 'lucide-react';
-import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useForm } from '@inertiajs/react';
 import SearchBar from "@/components/ui/search-bar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { Head, router, useForm } from '@inertiajs/react';
+import { Edit, Mail, Phone, Plus, Save, Trash2, Users, Calendar } from 'lucide-react';
+import { useState } from 'react';
 
 interface User {
     id: number;
@@ -126,14 +123,11 @@ export default function UserAllPage({ users }: UserAllPageProps) {
         });
     };
 
-    const   getRoleBadgeVariant = (role: string): "default" | "secondary" | "destructive" | "outline" => {
+    const getRoleBadgeVariant = (role: string): "default" | "secondary" | "destructive" | "outline" | "success" => {
         switch (role.toLowerCase()) {
             case 'admin':
-                return "default";
             case 'owner':
-                return "secondary";
             case 'renter':
-                return "outline";
             default:
                 return "outline";
         }
@@ -304,14 +298,14 @@ export default function UserAllPage({ users }: UserAllPageProps) {
                                             {user.name}
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-1">
+                                            <div className="flex items-center gap-2">
                                                 <Mail className="w-4 h-4 text-muted-foreground" />
                                                 {user.email}
                                             </div>
                                         </TableCell>
                                         <TableCell>
                                             {user.phone ? (
-                                                <div className="flex items-center gap-1">
+                                                <div className="flex items-center gap-2">
                                                     <Phone className="w-4 h-4 text-muted-foreground" />
                                                     {user.phone}
                                                 </div>
@@ -325,22 +319,21 @@ export default function UserAllPage({ users }: UserAllPageProps) {
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-1">
-                                                {user.email_verified ? (
-                                                    <>
-                                                        <CheckCircle className="w-4 h-4 text-green-500" />
-                                                        <span className="text-sm text-green-600">Verified</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <XCircle className="w-4 h-4 text-red-500" />
-                                                        <span className="text-sm text-red-600">Unverified</span>
-                                                    </>
-                                                )}
-                                            </div>
+                                            {user.email_verified ? (
+                                                <Badge variant="default">
+                                                    Verified
+                                                </Badge>
+                                            ) : (
+                                                <Badge variant="destructive">
+                                                    Unverified
+                                                </Badge>
+                                            )}
                                         </TableCell>
-                                        <TableCell className="text-muted-foreground">
-                                            {user.created_at}
+                                        <TableCell>
+                                            <div className="flex items-center gap-2 text-muted-foreground">
+                                                <Calendar className="w-4 h-4" />
+                                                {user.created_at}
+                                            </div>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex items-center justify-end gap-2">

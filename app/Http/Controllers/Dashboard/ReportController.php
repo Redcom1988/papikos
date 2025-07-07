@@ -107,7 +107,7 @@ class ReportController extends Controller
             $query->where('status', $status);
         }
 
-        $reports = $query->paginate(15);
+        $reports = $query->paginate(12);
 
         $reports->getCollection()->transform(function ($report) {
             return [
