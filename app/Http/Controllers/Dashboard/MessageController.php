@@ -35,40 +35,6 @@ class MessageController extends Controller
         ]);
     }
 
-    public function getMessages($userId)
-    {
-        try {
-            $authId = Auth::id();
-            
-            // Validate that userId is numeric
-            if (!is_numeric($userId)) {
-                return response()->json(['error' => 'Invalid user ID'], 400);
-            }
-            
-            // Check if the user exists
-            $userExists = User::where('id', $userId)->exists();
-            if (!$userExists) {
-                return response()->json(['error' => 'User not found'], 404);
-            }
-            
-            $messages = Message::where(function ($query) use ($authId, $userId) {
-                $query->where('sender', $authId)
-                    ->where('receiver', $userId);
-            })->orWhere(function ($query) use ($authId, $userId) {
-                $query->where('sender', $userId)
-                    ->where('receiver', $authId);
-            })
-            ->orderBy('created_at', 'asc')
-            ->get();
-
-            return response()->json($messages);
-            
-        } catch (\Exception $e) {
-            Log::error('Failed to fetch messages: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch messages'], 500);
-        }
-    }
-
     public function getChatUsers()
     {
         try {
