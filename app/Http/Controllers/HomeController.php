@@ -47,9 +47,22 @@ class HomeController extends Controller
         }
 
         // Get rooms for the grid (limited to 6 for homepage)
-        $rooms = Room::with(['owner', 'images', 'facilities'])
-            ->where('is_available', true)
-            ->latest()
+        $query = Room::with(['owner', 'images', 'facilities'])
+            ->where('is_available', true);
+
+        if ($filters['min_price']) {
+            $query->where('price', '>=', $filters['min_price']);
+        }
+        if ($filters['max_price'] && $filters['max_price'] < 999999999) {
+            $query->where('price', '<=', $filters['max_price']);
+        }
+        if (!empty($filters['facilities'])) {
+            $query->whereHas('facilities', function ($q) use ($filters) {
+                $q->whereIn('name', $filters['facilities']);
+            });
+        }
+
+        $rooms = $query->latest()
             ->take(6)
             ->get()
             ->map(function ($room) {
