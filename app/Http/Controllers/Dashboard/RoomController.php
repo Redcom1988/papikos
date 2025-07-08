@@ -48,7 +48,6 @@ class RoomController extends Controller
                         return [
                             'id' => $facility->id,
                             'name' => $facility->name,
-                            'icon' => $facility->icon,
                         ];
                     })->toArray(),
                     'facilities_count' => $room->facilities->count(),
@@ -96,7 +95,7 @@ class RoomController extends Controller
     // Show create form
     public function create()
     {
-        $facilities = Facility::select('id', 'name', 'description', 'icon')->get();
+        $facilities = Facility::select('id', 'name', 'description')->get();
         
         return Inertia::render('dashboard/room-form', [
             'facilities' => $facilities,
@@ -181,7 +180,7 @@ class RoomController extends Controller
             abort(403);
         }
 
-        $facilities = Facility::select('id', 'name', 'description', 'icon')->get();
+        $facilities = Facility::select('id', 'name', 'description')->get();
         
         $roomData = [
             'id' => $room->id,

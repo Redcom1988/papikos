@@ -225,7 +225,6 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
             }
         });
 
-        // Append images based on whether it's create or update
         if (room) {
             // For updates - use 'new_images'
             selectedFiles.forEach((file, index) => {
@@ -246,6 +245,11 @@ export default function RoomForm({ facilities, room, auth }: RoomFormProps) {
                 }
             });
         } else {
+            // For creates - use 'images' (this was missing!)
+            selectedFiles.forEach((file, index) => {
+                formData.append(`images[${index}]`, file);
+            });
+            
             router.post('/dashboard/rooms', formData, {
                 forceFormData: true,
                 onError: (errors) => {
