@@ -1,96 +1,132 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\BookmarkController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\RoomController;
-use App\Http\Controllers\RoomListingsController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\Dashboard\MessageController as DashboardMessageController;
-use App\Http\Controllers\Dashboard\ReportController as DashboardReportController;
-use App\Http\Controllers\Dashboard\RoomController as DashboardRoomController;
-use App\Http\Controllers\Dashboard\AppointmentController as DashboardAppointmentController;
-use App\Http\Controllers\Dashboard\UserController as DashboardUserController;
+use App\Http\Controllers\{
+    DashboardController,
+    BookmarkController,
+    HomeController,
+    RoomController,
+    RoomListingsController,
+    MessageController,
+    ReportController,
+    AppointmentController
+};
+use App\Http\Controllers\Dashboard\{
+    MessageController as DashboardMessageController,
+    ReportController as DashboardReportController,
+    RoomController as DashboardRoomController,
+    AppointmentController as DashboardAppointmentController,
+    UserController as DashboardUserController
+};
 use Illuminate\Support\Facades\Route;
 
-// Home/Landing page
+// Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('landing.page');
-
-// Room listings page
 Route::get('/rooms', [RoomListingsController::class, 'index'])->name('rooms.index');
-
-// Individual room routes
 Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('room.show');
 Route::get('/rooms/{room}/reports', [RoomController::class, 'showReports'])->name('room.reports');
 Route::get('/api/rooms/{room}', [RoomController::class, 'getRoomDetails'])->name('room.details');
 Route::post('/api/tours/book', [RoomController::class, 'bookTour'])->name('tour.book')->middleware('auth');
 
+// Authenticated User Routes
 Route::middleware('auth')->group(function () {
-    // Bookmarks routes
-    Route::post('/bookmarks/toggle', [BookmarkController::class, 'toggle'])->name('bookmarks.toggle');
-    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+    // Bookmarks
+    Route::controller(BookmarkController::class)->group(function () {
+        Route::post('/bookmarks/toggle', 'toggle')->name('bookmarks.toggle');
+        Route::get('/bookmarks', 'index')->name('bookmarks.index');
+    });
 
-    // Appointment routes
-    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
-    Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
-    Route::delete('/appointments/{appointment}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
+    // Appointments
+    Route::controller(AppointmentController::class)->group(function () {
+        Route::post('/appointments', 'store')->name('appointments.store');
+        Route::get('/appointments', 'index')->name('appointments.index');
+        Route::delete('/appointments/{appointment}', 'destroy')->name('appointments.destroy');
+    });
 
-    // Report routes for users/renters
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/create/{room}', [ReportController::class, 'create'])->name('reports.create');
-    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
-    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+    // Reports
+    Route::controller(ReportController::class)->group(function () {
+        Route::get('/reports', 'index')->name('reports.index');
+        Route::get('/reports/create/{room}', 'create')->name('reports.create');
+        Route::post('/reports', 'store')->name('reports.store');
+        Route::get('/reports/{report}', 'show')->name('reports.show');
+    });
 
-    // API Message routes (for sending messages)
-    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
-    
-    // Mobile chat API routes
-    Route::get('/api/chat-users', [DashboardMessageController::class, 'getChatUsers']);
-    Route::get('/api/users', [DashboardMessageController::class, 'getAllUsers']);
-    
-    // Message fetching route (used by both dashboard and mobile chat)
-    Route::get('/messages/{userId}', [DashboardMessageController::class, 'getMessages'])->name('messages.get');
+    // Messages (public/user)
+    Route::controller(MessageController::class)->group(function () {
+        Route::post('/messages', 'store')->name('messages.store');
+        Route::get('/messages/{userId}', 'getMessages')->name('messages.get');
+    });
+
+    // API Chat Users (for mobile chat)
+    Route::prefix('api')->group(function () {
+        Route::get('/chat-users', [DashboardMessageController::class, 'getChatUsers']);
+        Route::get('/users', [DashboardMessageController::class, 'getAllUsers']);
+    });
 });
 
-// Dashboard routes
 Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () {
-    // Dashboard main
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+});
+
+// Dashboard Routes (shared)
+Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('dashboard.')->group(function () {
     
-    // Dashboard reports
-    Route::get('/reports', [DashboardReportController::class, 'index'])->name('dashboard.reports');
-    Route::get('/reports-admin', [DashboardReportController::class, 'admin'])->name('dashboard.reports.admin');
-    Route::post('/reports/{report}/respond', [DashboardReportController::class, 'respond'])->name('dashboard.reports.respond');
-    Route::patch('/reports/{report}/status', [DashboardReportController::class, 'updateStatus'])->name('dashboard.reports.updateStatus');
-    
+
     // Dashboard messages
-    Route::get('/messages', [DashboardMessageController::class, 'index'])->name('dashboard.messages');
-    Route::get('/messages/users', [DashboardMessageController::class, 'getChatUsers']);
-    Route::get('/messages/all-users', [DashboardMessageController::class, 'getAllUsers']);
-    Route::get('/messages/{userId}', [DashboardMessageController::class, 'getMessages']);
+    Route::controller(DashboardMessageController::class)->prefix('messages')->group(function () {
+        Route::get('/', 'index')->name('');
+        Route::get('/users', 'getChatUsers');
+        Route::get('/all-users', 'getAllUsers');
+        Route::get('/{userId}', 'getMessages');
+    });
 
-    // Owner appointment routes
-    Route::get('/appointments', [DashboardAppointmentController::class, 'index'])->name('dashboard.appointments');
-    Route::patch('/appointments/{appointment}/cancel', [DashboardAppointmentController::class, 'cancel'])->name('dashboard.appointments.cancel');
-    Route::patch('/appointments/{appointment}/complete', [DashboardAppointmentController::class, 'complete'])->name('dashboard.appointments.complete');
-    
     // Dashboard rooms
-    Route::get('/rooms-owned', [DashboardRoomController::class, 'index'])->name('dashboard.rooms.owned');
-    Route::get('/rooms-all', [DashboardRoomController::class, 'all'])->name('dashboard.rooms.all');
-    Route::get('/rooms/create', [DashboardRoomController::class, 'create'])->name('dashboard.rooms.create');
-    Route::post('/rooms', [DashboardRoomController::class, 'store'])->name('dashboard.rooms.store');
-    Route::get('/rooms/{room}/edit', [DashboardRoomController::class, 'edit'])->name('dashboard.rooms.edit');
-    Route::put('/rooms/{room}', [DashboardRoomController::class, 'update'])->name('dashboard.rooms.update');
-    Route::delete('/rooms/{room}', [DashboardRoomController::class, 'destroy'])->name('dashboard.rooms.destroy');
+    Route::controller(DashboardRoomController::class)->prefix('rooms')->group(function () {
+        Route::get('/create', 'create')->name('rooms.create');
+        Route::post('/', 'store')->name('rooms.store');
+        Route::get('/{room}/edit', 'edit')->name('rooms.edit');
+        Route::put('/{room}', 'update')->name('rooms.update');
+        Route::delete('/{room}', 'destroy')->name('rooms.destroy');
+    });
+});
 
-    // Dashboard users
-    Route::get('/users', [DashboardUserController::class, 'index'])->name('dashboard.users');
-    Route::get('/users/{user}/edit', [DashboardUserController::class, 'edit'])->name('dashboard.users.edit');
-    Route::put('/users/{user}', [DashboardUserController::class, 'update'])->name('dashboard.users.update');
-    Route::delete('/users/{user}', [DashboardUserController::class, 'destroy'])->name('dashboard.users.destroy');
-    Route::post('/users', [DashboardUserController::class, 'store'])->name('dashboard.users.store');
+// Owner Dashboard Routes
+Route::middleware(['auth', 'verified', 'role:owner'])->prefix('dashboard')->name('dashboard.')->group(function () {
+    // Reports
+    Route::controller(DashboardReportController::class)->group(function () {
+        Route::get('/reports', 'index')->name('reports');
+        Route::post('/reports/{report}/respond', 'respond')->name('reports.respond');
+    });
+
+    // Appointments
+    Route::controller(DashboardAppointmentController::class)->group(function () {
+        Route::get('/appointments', 'index')->name('appointments');
+        Route::patch('/appointments/{appointment}/cancel', 'cancel')->name('appointments.cancel');
+        Route::patch('/appointments/{appointment}/complete', 'complete')->name('appointments.complete');
+    });
+
+    // Owned Rooms
+    Route::get('/rooms-owned', [DashboardRoomController::class, 'index'])->name('rooms.owned');
+});
+
+// Admin Dashboard Routes
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('dashboard')->name('dashboard.')->group(function () {
+    // Reports
+    Route::controller(DashboardReportController::class)->group(function () {
+        Route::get('/reports-admin', 'admin')->name('reports.admin');
+        Route::patch('/reports/{report}/status', 'updateStatus')->name('reports.updateStatus');
+    });
+
+    // All Rooms
+    Route::get('/rooms-all', [DashboardRoomController::class, 'all'])->name('rooms.all');
+
+    // Users
+    Route::controller(DashboardUserController::class)->prefix('users')->group(function () {
+        Route::get('/', 'index')->name('users');
+        Route::get('/{user}/edit', 'edit')->name('users.edit');
+        Route::put('/{user}', 'update')->name('users.update');
+        Route::delete('/{user}', 'destroy')->name('users.destroy');
+        Route::post('/', 'store')->name('users.store');
+    });
 });
 
 require __DIR__.'/auth.php';
