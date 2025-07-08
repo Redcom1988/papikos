@@ -11,7 +11,7 @@ class BookmarkSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::where('is_owner', false)->get();
+        $users = User::where('role', 'renter')->get();
         $rooms = Room::all();
 
         foreach ($users as $user) {

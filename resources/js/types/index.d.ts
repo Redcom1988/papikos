@@ -36,9 +36,7 @@ export interface User {
     name: string;
     email: string;
     phone?: string;
-    role: 'admin' | 'owner' | 'renter';
-    is_admin?: boolean;
-    is_owner?: boolean;
+    role: 'admin' | 'owner' | 'renter'; 
     email_verified_at: string | null;
     created_at: string;
 }
