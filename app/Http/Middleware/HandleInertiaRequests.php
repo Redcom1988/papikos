@@ -49,7 +49,7 @@ class HandleInertiaRequests extends Middleware
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
                     'phone' => $request->user()->phone,
-                    'role' => in_array($request->user()->role, ['renter', 'admin']) ? $request->user()->role : null,
+                    'role' => in_array($request->user()->role, ['owner', 'renter', 'admin']) ? $request->user()->role : null,
                     'email_verified_at' => $request->user()->email_verified_at,
                 ] : null,
             ],
