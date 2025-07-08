@@ -33,15 +33,20 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'phone' => ['nullable', 'string', 'max:20'],
-            'is_owner' => ['boolean'],
+            'role' => ['required', 'in:owner,renter'],
         ]);
+
+        $role = $request->role;
+        if (!in_array($role, ['owner', 'renter'])) {
+            $role = 'renter';
+        }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
-            'is_owner' => $request->boolean('is_owner', false),
+            'role' => $role,
         ]);
 
         event(new Registered($user));

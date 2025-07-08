@@ -15,17 +15,17 @@ type RegisterForm = {
     password: string;
     password_confirmation: string;
     phone: string;
-    is_owner: boolean;
+    role: 'owner' | 'renter';
 };
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
+    const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
         phone: '',
-        is_owner: false,
+        role: 'renter', // default to renter
     });
 
     const submit: FormEventHandler = (e) => {
@@ -122,21 +122,18 @@ export default function Register() {
                         <InputError message={errors.phone} className="mt-2" />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <input
-                            id="is_owner"
-                            name="is_owner"
-                            type="checkbox"
-                            checked={data.is_owner}
-                            onChange={(e) => setData('is_owner', e.target.checked)}
-                            disabled={processing}
-                            className="h-4 w-4 text-primary focus:ring-primary border-border rounded bg-background"
-                        />
-                        <Label htmlFor="is_owner" className="text-sm text-foreground">
-                            I want to list rooms (become an owner)
-                        </Label>
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Register as</label>
+                        <select
+                            value={data.role}
+                            onChange={e => setData('role', e.target.value as 'owner' | 'renter')}
+                            className="input"
+                        >
+                            <option value="renter">Renter</option>
+                            <option value="owner">Owner</option>
+                        </select>
+                        {errors.role && <div className="text-red-500 text-xs mt-1">{errors.role}</div>}
                     </div>
-                    <InputError message={errors.is_owner} />
 
                     <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}

@@ -202,7 +202,7 @@ class ReportSeeder extends Seeder
         ];
 
         foreach ($specificReports as $index => $reportData) {
-            $reporter = $users->where('is_owner', false)->random();
+            $reporter = $users->where('role', 'renter')->random();
             $room = $rooms->random();
             $createdAt = $faker->dateTimeBetween('-30 days', 'now');
             $responseDate = Carbon::parse($createdAt)->addDays(rand(2, 10));

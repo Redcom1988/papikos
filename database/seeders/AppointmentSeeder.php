@@ -11,7 +11,8 @@ class AppointmentSeeder extends Seeder
 {
     public function run(): void
     {
-        $users = User::where('is_owner', false)->get();
+        // Only select users with the 'renter' role
+        $users = User::where('role', 'renter')->get();
         $rooms = Room::all();
 
         foreach ($users as $user) {
