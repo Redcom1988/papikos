@@ -7,6 +7,8 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from 'react';
 import AuthLayout from '@/layouts/auth-layout';
 
 type RegisterForm = {
@@ -120,18 +122,24 @@ export default function Register() {
                             placeholder="Phone Number"
                         />
                         <InputError message={errors.phone} className="mt-2" />
-                    </div>
+                    </div> 
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Register as</label>
-                        <select
+                    <div className="grid gap-2">
+                        <Label htmlFor="role">Register as</Label>
+                        <Select
                             value={data.role}
-                            onChange={e => setData('role', e.target.value as 'owner' | 'renter')}
-                            className="input"
+                            onValueChange={value => setData('role', value as 'owner' | 'renter')}
                         >
-                            <option value="renter">Renter</option>
-                            <option value="owner">Owner</option>
-                        </select>
+                            <SelectTrigger
+                                className={`mt-1 border-gray-600 ${errors.role ? 'border-red-500' : ''}`}
+                            >
+                                <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="renter">Renter</SelectItem>
+                                <SelectItem value="owner">Owner</SelectItem>
+                            </SelectContent>
+                        </Select>
                         {errors.role && <div className="text-red-500 text-xs mt-1">{errors.role}</div>}
                     </div>
 
